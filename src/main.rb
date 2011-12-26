@@ -1,0 +1,120 @@
+# -*- coding: utf-8 -*-
+
+=begin
+
+Copyright (C) 2005-2006, Hiroyuki Ito. ZXB01226@nifty.com
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+USA.
+
+=end
+
+# $Id: main.rb,v 1.31 2011/09/25 12:57:52 hito Exp $
+
+require 'gtk2'
+require 'date'
+require 'optparse'
+
+APP_VERSION = "0.19"
+APP_NAME = "graif"
+APP_AUTHORS = ["H.Ito"]
+COPY_RIGHT = "Copyright © 2005-2010 #{APP_AUTHORS[0]}"
+WEBSITE = "http://homepage3.nifty.com/slokar/graif/"
+
+PKGDATADIR = "/usr/share/graif"
+ICON_FILE = "#{PKGDATADIR}/icon.png"
+
+APP_PATH = "#{ENV['HOME']}/.#{APP_NAME}"
+PLUGIN_PATH = "#{APP_PATH}/plugins"
+HIST_FILE = "#{APP_PATH}/history"
+CONFIG_FILE = "#{APP_PATH}/#{APP_NAME}.cfg"
+CONF_PATH = "/apps/#{APP_NAME}"
+HIST_SIZE = 100
+HIST_SIZE_MAX = 10000
+MIGEMO_CMD = "migemo -d /usr/share/migemo/migemo-dict"
+MIGEMO_OUTPUT_UTF8 = (ENV['LANG'] || "").upcase.match(/UTF-?8/)
+MIGEMO_KCODE = Encoding::EUCJP
+# MIGEMO_OUTPUT_UTF8 = false
+
+COMMALIZE = [3, ","]
+
+COLUMN_DATA_TITLE = 0
+COLUMN_DATA_ID    = 1
+COLUMN_DATA_TYPE  = 2
+COLUMN_DATA_EDIT  = 3
+
+begin
+  Gdk::Keyval::GDK_KEY_Left
+rescue
+  Gdk::Keyval.constants.each { |c|
+    new_const = c.to_s.sub("GDK_", "GDK_KEY_")
+    Gdk::Keyval.const_set(new_const, Gdk::Keyval.const_get(c))
+  }
+end
+
+require "util"
+require "raif"
+require "setting_panel"
+require "search_dialog"
+require "goto_dialog"
+require "dialog"
+require "setup_window"
+require "graph"
+require "receipt_dialog"
+require "icons"
+require "plugins"
+require "config"
+require "raif_ui"
+
+def _(s)
+  s
+end
+
+
+def CommalizeSetiing(n, s)
+  COMMALIZE[0] = n if (n.kind_of?(Fixnum))
+  COMMALIZE[1] = s if (s.kind_of?(String))
+end
+
+def Commalize(val)
+  return val.to_s if (COMMALIZE[0] < 1 || val.abs < 1000)
+  val.to_s.reverse.scan(/\d{1,#{COMMALIZE[0]}}[+-]?/).join(COMMALIZE[1]).reverse
+end
+
+Icon = Gdk::Pixbuf.new(PIG_XPM)
+
+date = nil
+
+OptionParser.new {|opt|
+  opt.on('-d', '--date=date') {|v|
+    begin
+      date = Date.parse(v)
+    rescue
+    end
+  }
+
+  begin
+    opt.parse!(ARGV)
+  rescue OptionParser::InvalidOption
+  end
+}
+
+Raif = Raif_ui.new(ARGV[0])
+
+def err_message(str, parent = Raif, type = Gtk::MessageDialog::ERROR, title = "Error")
+  Raif.err_message(str, parent, type, title)
+end
+
+Gtk::main if (Raif.init(date))

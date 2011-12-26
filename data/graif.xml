@@ -1,0 +1,65 @@
+<ui>
+  <menubar name="MenuBar">
+    <menu name="FileMenu" action="FileMenuAction">
+      <menuitem name="FileSave" action="FileSaveAction"/>
+      <separator/>
+      <menu name="FilePluginMenu" action="FilePluginMenuAction">
+      </menu>
+      <separator/>
+      <menuitem name="FileQuit" action="FileQuitAction"/>
+    </menu>
+    <menu name="EditMenu" action="EditMenuAction">
+      <menuitem name="EditCut" action="EditCutAction"/>
+      <menuitem name="EditCopy" action="EditCopyAction"/>
+      <menuitem name="EditPaste" action="EditPasteAction"/>
+      <menuitem name="EditDelete" action="EditDeleteAction"/>
+      <separator/>
+      <menuitem name="EditSearch" action="EditSearchAction"/>
+    </menu>
+    <menu name="ViewMenu" action="ViewMenuAction">
+      <menuitem name="ViewShowAccountSummary" action="ViewShowAccountSummaryAction"/>
+      <menuitem name="ViewShowCategorySummary" action="ViewShowCategorySummaryAction"/>
+      <menuitem name="ViewShowAccountInOut" action="ViewShowAccountInOutAction"/>
+      <menuitem name="ViewShowItemSummary" action="ViewShowItemSummaryAction"/>
+      <menuitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
+      <menuitem name="ViewShowGraph" action="ViewShowGraphAction"/>
+      <separator/>
+      <menuitem name="ViewGoto" action="ViewGotoAction"/>
+    </menu>
+    <menu name="SettingMenu" action="SettingMenuAction">
+      <menuitem name="SettingPreference" action="SettingPreferenceAction"/>
+      <menuitem name="SettingBudget" action="SettingBudgetAction"/>
+    </menu>
+    <menu name="HelpMenu" action="HelpMenuAction">
+      <menuitem name="HelpAbout" action="HelpAboutAction"/>
+    </menu>
+  </menubar>
+  <toolbar name="Toolbar">
+    <toolitem name="Save" action="FileSaveAction"/>
+
+    <separator/>
+    <toolitem name="ViewShowAccountSummary" action="ViewShowAccountSummaryAction"/>
+    <toolitem name="ViewShowCategorySummary" action="ViewShowCategorySummaryAction"/>
+    <toolitem name="ViewShowAccountInOut" action="ViewShowAccountInOutAction"/>
+    <toolitem name="ViewShowItemSummary" action="ViewShowItemSummaryAction"/>
+    <toolitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
+    <toolitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
+    <toolitem name="ViewShowGraph" action="ViewShowGraphAction"/>
+    <separator/>
+    <toolitem name="PrevMonth" action="ViewPrevMonthAction"/>
+    <toolitem name="PrevDay" action="ViewPrevDayAction"/>
+    <toolitem name="Today" action="ViewTodayAction"/>
+    <toolitem name="NextDay" action="ViewNextDayAction"/>
+    <toolitem name="NextMonth" action="ViewNextMonthAction"/>
+    <separator/>
+    <toolitem name="GoBack" action="ViewGoBackAction"/>
+    <toolitem name="GoForward" action="ViewGoForwardAction"/>
+  </toolbar>
+  <popup name="Popup" action="PopupAction">
+    <menuitem name="EditCut" action="EditCutAction"/>
+    <menuitem name="EditCopy" action="EditCopyAction"/>
+    <menuitem name="EditPaste" action="EditPasteAction"/>
+    <menuitem name="EditDelete" action="EditDeleteAction"/>
+    <separator/>
+  </popup>
+</ui>

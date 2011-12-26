@@ -1,0 +1,59 @@
+2010-06-10  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* receipt_dialog.rb (ReceiptDialog::create_table): "COLUMN_MEMO"
+	column is string.
+
+2010-05-01  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* raif.rb (Zaif_month::set_budget): don't call "to_i" method to
+	"sumup".
+
+2010-02-25  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* dialog.rb (AccountSummeryWindow::show_data)
+	(CategorySummeryWindow::show_data, BudgetWindow::show_data)
+	(MonthSummeryWindow::show_data, AccountInOutWindow::show_data)
+	(ItemSummeryWindow::show_data): set model as nil before update and
+	restore after update.
+	(CategorySummeryWindow::append_tree_item)
+	(BudgetWindow::append_tree_item, ItemSummeryWindow::add_item): add
+	argument "model".
+
+2010-02-03  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* receipt_dialog.rb (ReceiptDialog::create_table):use "TreeViewColumnNumeric" .
+
+	* raif_ui.rb (Raif_ui::create_table): use "TreeViewColumnNumeric" .
+
+	* dialog.rb (BudgetWindow::create_table)
+	(MonthSummeryWindow::create_table)
+	(AccountInOutWindow::create_table)
+	(ItemSummeryWindow::create_table): use "TreeViewColumnNumeric" .
+
+	* util.rb (TreeViewColumnNumeric): use "TreeViewColumnNumeric" .
+
+	* dialog.rb (AccountSummeryWindow::create_table): use "TreeViewColumnNumeric" .
+
+	* util.rb (TreeViewColumnNumeric::initialize): add.
+
+	* main.rb (Commalize): add.
+
+2009-02-28  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* dialog.rb (AccountInOutWindow::show_data)
+	(AccountInOutWindow::initialize): add year mode.
+
+2009-01-30  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* search_dialog.rb (SearchWidget): add.
+	(SearchDialog): use "SearchWidget" object.
+
+	* dialog.rb (ItemSummeryWindow): add.
+
+	* raif_ui.rb (Raif_ui::append_menu): add "show_item_summery" menu.
+	(Raif_ui::show_item_summery, Raif_ui::show_toggle_item_summery):
+	add.
+
+2008-10-10  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* dialog.rb (AccountInOutWindow): add.

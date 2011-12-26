@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+# -*- coding: utf-8 -*-
+
+RUBY       = ARGV.shift
+PKGDATADIR = ARGV.shift
+PKGVERSION = ARGV.shift
+
+puts("#! #{RUBY}")
+
+File.open(ARGV[-1], "r:utf-8") { |f1|
+  f1.each { |l|
+    a = l.scan(/require ["']([^'"]+)["']/)
+    if (a.size > 0)
+      a.each {|r|
+        f = r[0] + ".rb"
+        if (File.file?(f))
+          File.open(f, "r:utf-8") { |f2|
+            f2.each { |ll|
+              print ll if (ll[0] != ?#)
+            }
+          }
+        else
+          print l
+        end
+      }
+    elsif (l =~ /^PKGDATADIR/)
+      puts(%Q!PKGDATADIR = "#{PKGDATADIR}"!)
+    elsif (l =~ /^APP_VERSION/)
+      puts(%Q!APP_VERSION = "#{PKGVERSION}"!)
+    else
+      print l
+    end
+  }
+}
