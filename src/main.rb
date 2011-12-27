@@ -25,6 +25,7 @@ USA.
 
 require 'gtk2'
 require 'date'
+require 'fileutils'
 require 'optparse'
 
 APP_VERSION = "0.19"
