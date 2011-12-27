@@ -1,3 +1,12 @@
+2011-12-27  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* src/plugins.rb (Plugin::Plugin): load plugins from "PKGLIBDIR"
+	or "PLUGIN_PATH".
+
+	* src/main.rb (PKGLIBDIR): added.
+
+	* src/main.rb: create "APP_PATH" directory if not exist.
+
 2010-06-10  Ito Hiroyuki  <ZXB01226 at nifty.com>
 
 	* receipt_dialog.rb (ReceiptDialog::create_table): "COLUMN_MEMO"

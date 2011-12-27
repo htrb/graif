@@ -39,7 +39,7 @@ class Raif_ui < Gtk::Window
    "pig",
   ].each { |icon|
     const_set(icon.upcase, icon.to_sym)
-    MyIcons.add(icon, Gtk::IconSet.new(Gdk::Pixbuf.new("#{APP_PATH}/#{icon}.xpm")))
+    MyIcons.add(icon, Gtk::IconSet.new(Gdk::Pixbuf.new("#{PKGDATADIR}/#{icon}.xpm")))
   }
   MyIcons.add_default
 

@@ -13,7 +13,19 @@ class Plugin
     @@parent = parent
     @@calendar = calendar
 
-    Dir.glob("#{PLUGIN_PATH}/*.rb") {|file|
+    $LOAD_PATH.unshift()
+    $LOAD_PATH.unshift()
+
+    plugins = []
+    [PKGLIBDIR, PLUGIN_PATH].each {|dir|
+      $LOAD_PATH.unshift(dir)
+      Dir.chdir(dir) {
+        Dir.glob("*.rb") {|file|
+          plugins.push(file)
+        }
+      }
+    }
+    plugins.uniq.each {|file|
       require(file)
     }
   end

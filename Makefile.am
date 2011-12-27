@@ -1,1 +1,1 @@
-SUBDIRS = data src icons
+SUBDIRS = data src icons plugins

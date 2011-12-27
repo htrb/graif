@@ -34,6 +34,7 @@ COPY_RIGHT = "Copyright © 2005-2010 #{APP_AUTHORS[0]}"
 WEBSITE = "http://homepage3.nifty.com/slokar/graif/"
 
 PKGDATADIR = "/usr/share/graif"
+PKGLIBDIR = "/usr/lib/graif"
 ICON_FILE = "#{PKGDATADIR}/icon.png"
 
 APP_PATH = "#{ENV['HOME']}/.#{APP_NAME}"
@@ -91,6 +92,16 @@ end
 def Commalize(val)
   return val.to_s if (COMMALIZE[0] < 1 || val.abs < 1000)
   val.to_s.reverse.scan(/\d{1,#{COMMALIZE[0]}}[+-]?/).join(COMMALIZE[1]).reverse
+end
+
+unless (FileTest.exist?(APP_PATH))
+  Dir::mkdir(APP_PATH)
+  Dir::mkdir(PLUGIN_PATH)
+  Dir.chdir(PKGDATADIR) {
+    Dir.glob("config.xml").each {|file|
+      FileUtils.cp(file, APP_PATH)
+    }
+  }
 end
 
 Icon = Gdk::Pixbuf.new(PIG_XPM)

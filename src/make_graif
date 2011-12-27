@@ -25,6 +25,8 @@ File.open(ARGV[-1], "r:utf-8") { |f1|
       }
     elsif (l =~ /^PKGDATADIR/)
       puts(%Q!PKGDATADIR = "#{PKGDATADIR}"!)
+    elsif (l =~ /^PKGLIBDIR/)
+      puts(%Q!PKGLIBDIR = "#{PKGLIBDIR}"!)
     elsif (l =~ /^APP_VERSION/)
       puts(%Q!APP_VERSION = "#{PKGVERSION}"!)
     else
