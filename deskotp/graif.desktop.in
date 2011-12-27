@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Graif
+Comment=accounting
+Comment[ja]=家計簿
+TryExec=graif
+Exec=graif
+Icon=@pixmapdir@/application-x-graif.png
+Terminal=false
+Type=Application
+Version=1.0
+Categories=GTK;GNOME;Office;
+Encoding=UTF-8
