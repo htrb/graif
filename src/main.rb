@@ -75,7 +75,6 @@ require "dialog"
 require "setup_window"
 require "graph"
 require "receipt_dialog"
-require "icons"
 require "plugins"
 require "config"
 require "raif_ui"
@@ -105,7 +104,7 @@ unless (FileTest.exist?(APP_PATH))
   }
 end
 
-Icon = Gdk::Pixbuf.new(PIG_XPM)
+Icon = Gdk::Pixbuf.new("#{PKGDATADIR}/pig.xpm")
 
 date = nil
 
