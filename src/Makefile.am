@@ -1,9 +1,8 @@
 bin_SCRIPTS = graif
 
-SOURCES = config.rb goto_dialog.rb icons.rb plugins.rb raif_ui.rb	\
-	  setting_panel.rb test.rb dialog.rb graph.rb	\
-	  main.rb raif.rb receipt_dialog.rb search_dialog.rb		\
-	  setup_window.rb util.rb
+SOURCES = config.rb goto_dialog.rb plugins.rb raif_ui.rb		\
+	  setting_panel.rb test.rb dialog.rb graph.rb main.rb raif.rb	\
+	  receipt_dialog.rb search_dialog.rb setup_window.rb util.rb
 
 EXTRA_DIST = make_graif $(SOURCES)
 
