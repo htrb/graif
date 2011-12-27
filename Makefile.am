@@ -1,1 +1,1 @@
-SUBDIRS = data src icons plugins
+SUBDIRS = debian desktop data icons plugins src

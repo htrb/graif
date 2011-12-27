@@ -3,6 +3,7 @@
 
 RUBY       = ARGV.shift
 PKGDATADIR = ARGV.shift
+PKGLIBDIR = ARGV.shift
 PKGVERSION = ARGV.shift
 
 puts("#! #{RUBY}")
