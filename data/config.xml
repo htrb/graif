@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zaifconfig>
+<category id="10001" expense="0" income="1"><name>収入</name>
+<category id="10002" expense="0" income="1"><name>給料</name></category>
+<category id="10003" expense="0" income="1"><name>雑収入</name></category>
+</category>
+<category id="10004" expense="1" income="1"><name>住居費</name>
+<category id="10005" expense="1" income="1"><name>家賃</name></category>
+<category id="10006" expense="1" income="1"><name>光熱費</name>
+<category id="10007" expense="1" income="0"><name>電気</name></category>
+<category id="10008" expense="1" income="0"><name>ガス</name></category>
+<category id="10009" expense="1" income="0"><name>水道</name></category>
+</category>
+</category>
+<category id="10010" expense="1" income="1"><name>食費</name>
+<category id="10011" expense="1" income="1"><name>食事</name></category>
+<category id="10012" expense="1" income="1"><name>食品</name></category>
+<category id="10013" expense="1" income="1"><name>飲代</name></category>
+</category>
+<category id="10014" expense="1" income="0"><name>書籍</name>
+<category id="10015" expense="1" income="0"><name>文学</name></category>
+<category id="10016" expense="1" income="0"><name>雑誌</name></category>
+<category id="10017" expense="1" income="0"><name>漫画</name></category>
+<category id="10018" expense="1" income="0"><name>技術書</name></category>
+<category id="10019" expense="1" income="0"><name>その他</name></category>
+</category>
+<category id="10020" expense="1" income="1"><name>交通・宿泊</name>
+<category id="10021" expense="1" income="1"><name>交通費</name></category>
+<category id="10022" expense="1" income="1"><name>宿泊費</name></category>
+</category>
+<category id="10023" expense="1" income="1"><name>備品</name></category>
+<category id="10024" expense="1" income="1"><name>その他</name>
+<category id="10025" expense="1" income="0"><name>衣料品</name></category>
+<category id="10026" expense="1" income="1"><name>雑費</name></category>
+<category id="10027" expense="1" income="0"><name>医療費</name></category>
+</category>
+<category id="10028" expense="0" income="1"><name>初期設定</name></category>
+<account id="10001"><name>現金</name><closing>31</closing></account>
+<account id="10002" credit="1"><name>クレジット</name><closing>1</closing></account>
+<account id="10003"><name>普通預金</name><closing>31</closing></account>
+<account id="10004"><name>定期預金</name><closing>31</closing></account>
+<account id="10005"><name>Suica</name><closing>31</closing></account>
+<account id="10006"><name>Edy</name><closing>31</closing></account>
+</zaifconfig>
