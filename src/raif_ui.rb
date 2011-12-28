@@ -116,20 +116,6 @@ class Raif_ui < Gtk::Window
       m.find_init
     }
 
-    @tree_view_menu = EditPopupMenu.new
-    @tree_view_menu.delete_event {|w|
-      delete_item(@tree_view.selection.selected)
-    }
-    @tree_view_menu.cut_event {|w|
-      cut_item(@tree_view.selection.selected)
-    }
-    @tree_view_menu.copy_event {|w|
-      copy_item(@tree_view.selection.selected)
-    }
-    @tree_view_menu.paste_event {|w|
-      paste_clipboard
-    }
-
     @tree_view = create_table
 
     @tree_view.selection.signal_connect('changed') {|w|
@@ -177,11 +163,8 @@ class Raif_ui < Gtk::Window
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
-      if e.kind_of? Gdk::EventButton
-        if (e.button == 3)
-          itr = @tree_view.selection.selected
-          @tree_view_menu.popup(itr, @clipboard, e.button, e.time)
-        end
+      if (e.kind_of?(Gdk::EventButton) && e.button == 3)
+        @tree_view_menu.popup(nil, nil, 3, Gtk.current_event_time)
       end
     }
 
@@ -270,7 +253,7 @@ class Raif_ui < Gtk::Window
     w = @ui.get_widget("/Toolbar")
     vbox.pack_start(w, false, false, 0)
 
-    @popup_menu = @ui.get_widget("/Popup")
+    @tree_view_menu = @ui.get_widget("/Popup")
   end
 
   def init(date)
@@ -966,7 +949,7 @@ class Raif_ui < Gtk::Window
     end
   end
 
-  def delete_item(itr)
+  def delete_item(itr = @tree_view.selection.selected)
     if (itr)
       item = itr.get_value(COLUMN_ITEM)
       @zaif_data.delete_item(@calendar.year, @calendar.month + 1, @calendar.day, item)

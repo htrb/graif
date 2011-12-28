@@ -765,7 +765,7 @@ class MonthSummaryWindow < SummaryWindow
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
-      if (e.kind_of? Gdk::EventButton)
+      if (e.kind_of?(Gdk::EventButton))
         if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
           select_item
         end
@@ -944,7 +944,7 @@ class AccountInOutWindow < SummaryWindow
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
-      if (e.kind_of? Gdk::EventButton)
+      if (e.kind_of?(Gdk::EventButton))
         if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
           select_item
         end
@@ -1161,7 +1161,7 @@ class ItemSummaryWindow < SummaryWindow
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
-      if (e.kind_of? Gdk::EventButton)
+      if (e.kind_of?(Gdk::EventButton))
         if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
           select_item
         end

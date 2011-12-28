@@ -1,3 +1,10 @@
+2011-12-28  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* src/raif_ui.rb (Raif_ui::create_ui, Raif_ui::initialize): use
+	popup-menu created by "@ui.get_widget".
+
+	* src/util.rb: remove definition of the class "EditPopupMenu".
+
 2011-12-27  Ito Hiroyuki  <ZXB01226 at nifty.com>
 
 	* src/plugins.rb (Plugin::Plugin): load plugins from "PKGLIBDIR"

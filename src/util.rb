@@ -717,56 +717,6 @@ class MyProgressBar < Gtk::ProgressBar
   end
 end
 
-class EditPopupMenu < Gtk::Menu
-  def initialize
-    super
-    @cut = Gtk::ImageMenuItem.new(Gtk::Stock::CUT)
-    @copy = Gtk::ImageMenuItem.new(Gtk::Stock::COPY)
-    @paste = Gtk::ImageMenuItem.new(Gtk::Stock::PASTE)
-    @delete = Gtk::ImageMenuItem.new(Gtk::Stock::DELETE)
-
-    append(@cut)
-    append(@copy)
-    append(@paste)
-    append(@delete)
-    self.show_all
-  end
-
-  def delete_event(&block)
-    @delete.signal_connect("activate") {|w|
-      yield(w)
-    }
-  end
-
-  def paste_event(&block)
-    @paste.signal_connect("activate") {|w|
-      yield(w)
-    }
-  end
-
-  def copy_event(&block)
-    @copy.signal_connect("activate") {|w|
-      yield(w)
-    }
-  end
-
-  def cut_event(&block)
-    @cut.signal_connect("activate") {|w|
-      yield(w)
-    }
-  end
-
-  def popup(iter, clipboard, button, time)
-    @paste.sensitive = clipboard.wait_is_text_available?
-
-    @cut.sensitive    = ! iter.nil?
-    @copy.sensitive   = ! iter.nil?
-    @delete.sensitive = ! iter.nil?
-
-    super(nil, nil, button, time)
-  end
-end
-
 class Migemo
   COMMAND = "migemo -d /usr/share/migemo/migemo-dict" 
 
