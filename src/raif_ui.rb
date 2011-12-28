@@ -30,15 +30,16 @@ class Raif_ui < Gtk::Window
 
   MyIcons = Gtk::IconFactory.new
   [
-   "bar_graph",
-   "book_blue",
-   "book_green",
-   "book_open",
-   "book_red",
-   "book_yellow",
-   "pig",
-  ].each { |icon|
+   ["bar_graph",   _('分類グラフ(_G)')],
+   ["book_red",    _('分類集計(_C)')],
+   ["book_blue",   _('口座集計(_A)')],
+   ["book_green",  _('項目集計(_I)')],
+   ["book_yellow", _('口座出入金集計(_O)')],
+   ["book_open",   _('月データ一覧(_S)')],
+   ["pig",           'graif'],
+  ].each { |(icon, label)|
     const_set(icon.upcase, icon.to_sym)
+    Gtk::Stock.add(icon.to_sym, label)
     MyIcons.add(icon, Gtk::IconSet.new(Gdk::Pixbuf.new("#{PKGDATADIR}/#{icon}.xpm")))
   }
   MyIcons.add_default
@@ -368,42 +369,42 @@ class Raif_ui < Gtk::Window
      ],
      [
       "ViewShowAccountSummaryAction",
-      _('口座集計(_A)...'),
+      _('口座集計(_A)'),
       _('口座集計を表示します'),
       proc{show_account_summary(@calendar.year, @calendar.month + 1)},
       BOOK_BLUE
      ],
      [
       "ViewShowCategorySummaryAction",
-      _('分類集計(_C)...'),
+      _('分類集計(_C)'),
       _('分類集計を表示します'),
       proc{show_category_summary(@calendar.year, @calendar.month + 1)},
       BOOK_RED
      ],
      [
       "ViewShowAccountInOutAction",
-      _('口座出入金集計(_O)...'),
+      _('口座出入金集計(_O)'),
       '口座出入金集計を表示します',
       proc{show_account_in_out(@calendar.year, @calendar.month + 1)},
       BOOK_YELLOW
      ],
      [
       "ViewShowItemSummaryAction",
-      _('項目集計(_I)...'),
+      _('項目集計(_I)'),
       '検索項目集計を表示します',
       proc{show_item_summary(@calendar.year, @calendar.month + 1)},
       BOOK_GREEN
      ],
      [
       "ViewShowMonthSummeryAction",
-      _('月データ一覧(_S)...'),
+      _('月データ一覧(_S)'),
       '月のデータ一覧を表示します',
       proc{show_month_summary(@calendar.year, @calendar.month + 1)},
       BOOK_OPEN
      ],
      [
       "ViewShowGraphAction",
-      _('分類グラフ(_G)...'),
+      _('分類グラフ(_G)'),
       '分類のグラフを表示します',
       proc{show_graph(@calendar.year, @calendar.month + 1)},
       BAR_GRAPH
@@ -417,49 +418,49 @@ class Raif_ui < Gtk::Window
      ],
      [
       "ViewPrevMonthAction",
-      _('前月(_P)...'),
+      _('前月(_P)'),
       '前月に移動します',
       proc{@calendar.prev_month},
       Gtk::Stock::MEDIA_PREVIOUS
      ],
      [
       "ViewPrevDayAction",
-      _('前日(_P)...'),
+      _('前日(_P)'),
       '前日に移動します',
       proc{@calendar.prev_day},
       Gtk::Stock::MEDIA_REWIND
      ],
      [
       "ViewTodayAction",
-      _('本日(_T)...'),
+      _('本日(_T)'),
       '本日に移動します',
       proc{@calendar.today},
       Gtk::Stock::HOME
      ],
      [
       "ViewNextDayAction",
-      _('翌日(_N)...'),
+      _('翌日(_N)'),
       '翌日に移動します',
       proc{@calendar.next_day},
       Gtk::Stock::MEDIA_FORWARD
      ],
      [
       "ViewNextMonthAction",
-      _('翌月(_P)...'),
+      _('翌月(_P)'),
       '翌月に移動します',
       proc{@calendar.next_month},
       Gtk::Stock::MEDIA_NEXT
      ],
      [
       "ViewGoBackAction",
-      _('戻る(_B)...'),
+      _('戻る(_B)'),
       '戻る',
       proc{@calendar.back},
       Gtk::Stock::GO_BACK
      ],
      [
       "ViewGoForwardAction",
-      _('進む(_F)...'),
+      _('進む(_F)'),
       '進む',
       proc{@calendar.forward},
       Gtk::Stock::GO_FORWARD
