@@ -25,8 +25,8 @@ class SettingPanel < Gtk::Notebook
     ].each {|(title, method)|
       append_page(method, MyLabel.new(title))
     }
-#    update_account_selection(0)
-#    update_category_selection(0)
+    update_account_selection(0)
+    update_category_selection(0)
   end
 
   def date(y, m, d)
@@ -200,7 +200,6 @@ class SettingPanel < Gtk::Notebook
     [cmb, entry]
   end
 
-=begin
   def update_account_selection(active = false)
     [
       @expenses_page_account,
@@ -220,7 +219,6 @@ class SettingPanel < Gtk::Notebook
     @expenses_page_category.active = active if (active)
     @income_page_category.active = active if (active)
   end
-=end
 
   def init_value(type = nil, init_time = true)
     t = Time.new
