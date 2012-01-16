@@ -1,3 +1,11 @@
+2012-01-16  Ito Hiroyuki  <ZXB01226 at nifty.com>
+
+	* src/raif_ui.rb (Raif_ui::check_process): added.
+	(Raif_ui::init): check existance of lock file.
+	(Raif_ui::close): delete lock file.
+
+	* src/main.rb: add constant "LOCK_FILE".
+
 2012-01-03  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/setting_panel.rb (SettingPanel#create_fee_input): uncomment

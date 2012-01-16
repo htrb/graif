@@ -257,15 +257,16 @@ class Raif_ui < Gtk::Window
     @tree_view_menu = @ui.get_widget("/Popup")
   end
 
+  def check_process
+    if (File.exist?(LOCK_FILE))
+      return false unless (conf_message("他の #{APP_NAME} が起動している可能性があります。\n新しく#{APP_NAME} を起動しますか？", false))
+    end
+    true
+  end
+
   def init(date)
-    # pid = get_gconf_int('/process/pid')
-    # if (pid != 0)
-    #   if (date)
-    #     set_gconf('/process/date', date.to_s)
-    #     return false
-    #   end
-    #   return false unless (conf_message("他の #{APP_NAME} が起動している可能性があります。\n新しく#{APP_NAME} を起動しますか？", false))
-    # end
+    return false unless (check_process)
+    File.open(LOCK_FILE, "w").close
 
     main_size = get_gconf('/window/main_geomtry')
     self.parse_geometry(main_size) if (main_size)
@@ -675,6 +676,7 @@ class Raif_ui < Gtk::Window
       save_win_size
       @app_conf.save
       Gtk::main_quit
+      File.delete(LOCK_FILE)
     end
   end
 

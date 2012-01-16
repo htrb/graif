@@ -42,6 +42,7 @@ APP_PATH = "#{ENV['HOME']}/.#{APP_NAME}"
 PLUGIN_PATH = "#{APP_PATH}/plugins"
 HIST_FILE = "#{APP_PATH}/history"
 CONFIG_FILE = "#{APP_PATH}/#{APP_NAME}.cfg"
+LOCK_FILE  = "#{APP_PATH}/graif.lock"
 CONF_PATH = "/apps/#{APP_NAME}"
 HIST_SIZE = 100
 HIST_SIZE_MAX = 10000
