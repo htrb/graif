@@ -2,12 +2,12 @@ Source: graif
 Section: office
 Priority: extra
 Maintainer: Ito Hiroyuki <ZXB01226@nifty.com>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Build-Depends: ruby1.9.1, debhelper (>= 8.0.0), autotools-dev
 Standards-Version: 3.7.3
 Homepage: https://sourceforge.net/projects/graif/
 
 Package: graif
 Architecture: all
-Depends: ruby1.9.1, ruby1.9.1-dev, rubygems
+Depends: ruby1.9.1
 Description: accounting.
  Graif is an accounting software.
