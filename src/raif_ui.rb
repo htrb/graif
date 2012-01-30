@@ -259,7 +259,7 @@ class Raif_ui < Gtk::Window
 
   def check_process
     if (File.exist?(LOCK_FILE))
-      return false unless (conf_message("他の #{APP_NAME} が起動している可能性があります。\n新しく#{APP_NAME} を起動しますか？", false))
+      return false unless (conf_message("他の #{APP_NAME} が起動している可能性があります。\n新しく#{APP_NAME} を起動しますか？", self, false))
     end
     true
   end
