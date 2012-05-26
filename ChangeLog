@@ -1,3 +1,24 @@
+2012-05-26  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* plugins/Makefile.am (plugindir): plugins are installed in
+	"$(pkgdatadir)/plugins".
+
+	* data/Makefile.am (EXTRA_DIST): UI definition and default
+	configuration are included in the distribution.
+
+	* icons/Makefile.am (EXTRA_DIST): icons are included in the
+	distribution.
+
+2012-05-26  KOBAYASHI Shinji <koba at users.sourceforge.jp>
+
+	* src/util.rb (Migemo#get_regexp): use "String#encode" to convert
+	encodeing of the string.
+
+	* configure.in: fix typo
+
+	* src/main.rb: set "Encoding.default_external" as
+	"Encoding::UTF_8".
+
 2012-01-16  Ito Hiroyuki  <ZXB01226 at nifty.com>
 
 	* src/raif_ui.rb (Raif_ui::check_process): added.
