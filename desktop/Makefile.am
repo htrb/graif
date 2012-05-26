@@ -1,7 +1,7 @@
 gnomedatadir = $(datadir)
 
 pixmapdir = $(gnomedatadir)/pixmaps
-pixmap_DATA = application-x-graif.png
+dist_pixmap_DATA = application-x-graif.png
 
 desktopdir = $(datadir)/applications
 desktop_in_files = graif.desktop.in
@@ -12,4 +12,4 @@ graif.desktop: graif.desktop.in
 
 DISTCLEANFILES = $(desktop_DATA)
 
-EXTRA_DIST = graif.desktop.in application-x-graif.png
+EXTRA_DIST = graif.desktop.in
