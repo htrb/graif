@@ -10,5 +10,4 @@ $(bin_SCRIPTS): $(SOURCES) make_graif Makefile
 	$(RUBY_BIN) make_graif $(RUBY_FULL_PATH) $(pkgdatadir) $(pkglibdir) $(PACKAGE_VERSION) main.rb > $(bin_SCRIPTS)
 	chmod 755 $(bin_SCRIPTS)
 
-clean:
-	rm -f $(bin_SCRIPTS)
+CLEANFILES = $(bin_SCRIPTS)
