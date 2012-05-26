@@ -1,2 +1,3 @@
-pkglib_SCRIPTS = save_csv.rb
-EXTRA_DIST = $(pkglib_SCRIPTS)
+plugindir = $(pkgdatadir)/plugins
+plugin_SCRIPTS = save_csv.rb
+EXTRA_DIST = $(plugin_SCRIPTS)
