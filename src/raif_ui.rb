@@ -6,7 +6,7 @@ class Raif_ui < Gtk::Window
                  ['*',       :COLUMN_TYPE,     String],
                  [_('分類'), :COLUMN_CATEGORY, String],
                  [_('収入'), :COLUMN_INCOME,   Numeric],
-                 
+
                  [_('支出'), :COLUMN_EXPENSE,  Numeric],
                  [_('口座'), :COLUMN_ACCOUNT,  String],
                  [_('時刻'), :COLUMN_TIME,     String],
@@ -318,7 +318,7 @@ class Raif_ui < Gtk::Window
       _("_Quit"),
       _("Quit program"),
       proc{close},
-      Gtk::Stock::QUIT, 
+      Gtk::Stock::QUIT,
      ],
      [
       "EditCutAction",
@@ -343,7 +343,7 @@ class Raif_ui < Gtk::Window
      ],
      [
       "EditDeleteAction",
-      _('_Delete'),                     
+      _('_Delete'),
       _('Delete selected'),
       proc{delete_item},
       Gtk::Stock::DELETE,
@@ -517,7 +517,7 @@ class Raif_ui < Gtk::Window
      ],
     ].each { |item|
       action = Gtk::Action.new(item[0], item[1], item[2], item[4])
-      if (item[3]) 
+      if (item[3])
         action.signal_connect("activate") {
           item[3].call
         }
