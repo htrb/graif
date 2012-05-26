@@ -14,7 +14,7 @@ AC_CHECK_PROG(RUBY1_9_3, ruby1.9.3, yes, no)
 AC_CHECK_PROG(RUBY, ruby, yes, no)
 if test "$RUBY" = "yes"
 then
-   case 'ruby --version' in
+   case `ruby --version` in
    "ruby 1.9"*)
      RUBY_BIN=ruby
      ;;
