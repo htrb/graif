@@ -12,7 +12,7 @@ class TreeViewColumnNumeric < Gtk::TreeViewColumn
     super(title, renderer)
     set_cell_data_func(renderer) { |col, rend, model, iter|
       val = iter[column]
-      
+
       str = if (val.kind_of?(Float))
               if (val == 0.0)
                 "--"
@@ -548,7 +548,7 @@ class TimeInput < Gtk::HBox
   def initialize(pad = 4)
     super()
     t = Time.new
-    
+
     @hour = Gtk::SpinButton.new(0, 23, 1)
     @min  = Gtk::SpinButton.new(-1, 60, 1)
     @hour.xalign = 1
@@ -718,7 +718,7 @@ class MyProgressBar < Gtk::ProgressBar
 end
 
 class Migemo
-  COMMAND = "migemo -d /usr/share/migemo/migemo-dict" 
+  COMMAND = "migemo -d /usr/share/migemo/migemo-dict"
 
   def Migemo.callback
     proc {
@@ -760,7 +760,7 @@ class Migemo
       if (MIGEMO_OUTPUT_UTF8)
         @migemo.gets.chomp
       else
-        @migemo.gets.chomp(Encoding::UTF_8, MIGEMO_KCODE)
+        @migemo.gets.chomp.encode(Encoding::UTF_8, MIGEMO_KCODE)
       end
     rescue
       reopen
