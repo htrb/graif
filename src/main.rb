@@ -23,6 +23,8 @@ USA.
 
 # $Id: main.rb,v 1.31 2011/09/25 12:57:52 hito Exp $
 
+Encoding.default_external = Encoding::UTF_8
+
 require 'gtk2'
 require 'date'
 require 'fileutils'
