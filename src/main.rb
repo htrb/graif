@@ -37,7 +37,6 @@ COPY_RIGHT = "Copyright © 2005-2010 #{APP_AUTHORS[0]}"
 WEBSITE = "http://homepage3.nifty.com/slokar/graif/"
 
 PKGDATADIR = "/usr/share/graif"
-PKGLIBDIR = "/usr/lib/graif"
 ICON_FILE = "#{PKGDATADIR}/icon.png"
 
 APP_PATH = "#{ENV['HOME']}/.#{APP_NAME}"

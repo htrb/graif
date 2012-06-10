@@ -1,3 +1,7 @@
+2012-06-10  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/plugins.rb (Plugin.init): fix plugins path.
+
 2012-05-26  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* plugins/Makefile.am (plugindir): plugins are installed in

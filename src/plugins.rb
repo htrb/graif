@@ -17,7 +17,7 @@ class Plugin
     $LOAD_PATH.unshift()
 
     plugins = []
-    [PKGLIBDIR, PLUGIN_PATH].each {|dir|
+    ["#{PKGDATADIR}/plugins", PLUGIN_PATH].each {|dir|
       $LOAD_PATH.unshift(dir)
       Dir.chdir(dir) {
         Dir.glob("*.rb") {|file|
