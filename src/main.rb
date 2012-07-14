@@ -47,9 +47,9 @@ LOCK_FILE  = "#{APP_PATH}/graif.lock"
 CONF_PATH = "/apps/#{APP_NAME}"
 HIST_SIZE = 100
 HIST_SIZE_MAX = 10000
-MIGEMO_CMD = "migemo -d /usr/share/migemo/migemo-dict"
-MIGEMO_OUTPUT_UTF8 = (ENV['LANG'] || "").upcase.match(/UTF-?8/)
-MIGEMO_KCODE = Encoding::EUCJP
+MIGEMO_CMD = "cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict"
+MIGEMO_OUTPUT_UTF8 = true
+MIGEMO_KCODE = Encoding::UTF_8
 # MIGEMO_OUTPUT_UTF8 = false
 
 COMMALIZE = [3, ","]
