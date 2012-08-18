@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(graif, 1.0.1, ZXB01226@nifty.com, graif)
+AC_INIT(graif, 1.0.2, ZXB01226@nifty.com, graif)
 
 AC_CONFIG_SRCDIR(src/main.rb)
 AM_INIT_AUTOMAKE
@@ -11,6 +11,7 @@ AC_PROG_INSTALL
 AC_CHECK_PROG(RUBY1_9, ruby1.9, yes, no)
 AC_CHECK_PROG(RUBY1_9_1, ruby1.9.1, yes, no)
 AC_CHECK_PROG(RUBY1_9_3, ruby1.9.3, yes, no)
+AC_CHECK_PROG(RUBY19, ruby19, yes, no)
 AC_CHECK_PROG(RUBY, ruby, yes, no)
 if test "$RUBY" = "yes"
 then
@@ -32,6 +33,9 @@ then
   elif test "$RUBY1_9" = "yes"
   then
     RUBY_BIN=ruby1.9
+  elif test "$RUBY19" = "yes"
+  then
+    RUBY_BIN=ruby19
   fi
 fi
 
