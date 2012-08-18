@@ -789,9 +789,13 @@ class Memo_entry < Gtk::Entry
         @key = self.text.dup
 #        puts key.kconv(MIGEMO_KCODE, Kconv::UTF8)
 #        puts self.text.kconv(MIGEMO_KCODE, Kconv::UTF8)
-        if (@@use_migemo)
-          @key_regexp = /\A(?:#{migemo_get_regexp(@key)})/i
-        else
+        begin
+          if (@@use_migemo)
+            @key_regexp = /\A(?:#{migemo_get_regexp(@key)})/i
+          else
+            @key_regexp = /\A#{Regexp.escape(@key.downcase)}/
+          end
+        rescue
           @key_regexp = /\A#{Regexp.escape(@key.downcase)}/
         end
       end
