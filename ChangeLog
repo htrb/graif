@@ -1,3 +1,7 @@
+2012-08-19  Hajimu UMEMOTO
+
+	* configure.in: check "ruby19".
+
 2012-06-10  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/plugins.rb (Plugin.init): fix plugins path.
