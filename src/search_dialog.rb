@@ -3,7 +3,7 @@
 
 class SearchWidget
   def initialize
-    @vbox =Gtk::VBox.new
+    @vbox =Gtk::Box.new(:vertical, 0)
 
     @memo = Memo_entry.new
     @memo.activates_default = true
@@ -22,10 +22,10 @@ class SearchWidget
       [@rb_account, @account, false],
       [@rb_category, @category, false]
     ].each {|(widget, val, pack)|
-      hbox = Gtk::HBox.new
-      hbox.pack_start(widget, false, false, 0)
-      hbox.pack_start(val, pack, pack, 0)
-      @vbox.pack_start(hbox, false, false, 4)
+      hbox = Gtk::Box.new(:horizontal, 0)
+      hbox.pack_start(widget, :expand => false, :fill => false, :padding => 0)
+      hbox.pack_start(val, :expand => pack, :fill => pack, :padding => 0)
+      @vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 4)
       val.sensitive = false
       widget.signal_connect("toggled") {|w|
         if (w.active?)
@@ -71,12 +71,14 @@ end
 
 class SearchDialog < Gtk::Dialog
   def initialize(parent)
-    super("検索",
-          parent,
-          Gtk::Dialog::MODAL,
-          [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
-          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK]
-          )
+    super(:title => "検索",
+          :parent => parent,
+          :flags => Gtk::Dialog::Flags::MODAL,
+          :buttons => [
+            [Gtk::Stock::CANCEL, Gtk::ResponseType::CANCEL],
+            [Gtk::Stock::OK, Gtk::ResponseType::OK]
+          ]
+         )
 
     signal_connect("delete-event") {|w, e|
       w.hide
@@ -85,14 +87,14 @@ class SearchDialog < Gtk::Dialog
 
     @search_item = SearchWidget.new
 
-    self.vbox.pack_start(@search_item.widget, false, false, 10)
-    set_default_response(Gtk::Dialog::RESPONSE_OK)
+    self.child.pack_start(@search_item.widget, :expand => false, :fill => false, :padding => 10)
+    set_default_response(Gtk::ResponseType::OK)
   end
 
   def run(&block)
     show_all
     super {|r|
-      yield(r == Gtk::Dialog::RESPONSE_OK, @search_item.type, @search_item.word)
+      yield(r == Gtk::ResponseType::OK, @search_item.type, @search_item.word)
     }
     hide
   end

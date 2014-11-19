@@ -16,8 +16,8 @@ class GraphWindow < DialogWindow
 
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_W, Gdk::Keyval::GDK_KEY_w
-        hide if ((e.state & Gdk::Window::CONTROL_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
+        hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
       end
     }
 
@@ -28,16 +28,16 @@ class GraphWindow < DialogWindow
 
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_W, Gdk::Keyval::GDK_KEY_w
-        hide if ((e.state & Gdk::Window::CONTROL_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
+        hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
       end
     }
 
-    vbox = Gtk::VBox.new
-    vbox.pack_start(@category_expense, false, false, 0)
-    vbox.pack_start(@category_income, false, false, 0)
-    vbox.pack_start(@graph, true, true, 0)
-    vbox.pack_start(create_btns, false, false, 0)
+    vbox = Gtk::Box.new(:vertical, 0)
+    vbox.pack_start(@category_expense, :expand => false, :fill => false, :padding => 0)
+    vbox.pack_start(@category_income, :expand => false, :fill => false, :padding => 0)
+    vbox.pack_start(@graph, :expand => true, :fill => true, :padding => 0)
+    vbox.pack_start(create_btns, :expand => false, :fill => false, :padding => 0)
 
     @category = @category_expense
     self.add(vbox)
@@ -89,6 +89,7 @@ class GraphWindow < DialogWindow
       get_data(y, start)
     end
     @graph.draw(@data, @parent.start_of_year)
+    self.window.invalidate_rect(nil)
   end
 
   def get_category_summary(category, summary)
@@ -185,24 +186,24 @@ class GraphWindow < DialogWindow
   end
 
   def create_btns
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     [
-      [Gtk::Stock::GO_BACK,    :show_prev,  :pack_start],
-      [_(' 今年 '),            :show_today, :pack_start],
-      [Gtk::Stock::GO_FORWARD, :show_next,  :pack_start],
-      [Gtk::Stock::CLOSE,      :hide,       :pack_end],
-      [Gtk::Stock::REFRESH,    :refresh,    :pack_end],
-    ].each {|(title, method, pack)|
-      btn = Gtk::Button.new(title)
+      [Gtk::Stock::GO_BACK,    nil, :show_prev,  :pack_start],
+      [nil,            _(' 今年 '), :show_today, :pack_start],
+      [Gtk::Stock::GO_FORWARD, nil, :show_next,  :pack_start],
+      [Gtk::Stock::CLOSE,      nil, :hide,       :pack_end],
+      [Gtk::Stock::REFRESH,    nil, :refresh,    :pack_end],
+    ].each {|(title, label, method, pack)|
+      btn = Gtk::Button.new(:label => label, :mnemonic => nil, :stock_id => title)
       btn.signal_connect('clicked') {|w|
         send(method)
       }
-      hbox.send(pack, btn, false, false, 0)
+      hbox.send(pack, btn, :expand => false, :fill => false, :padding => 0)
       @refresh_btn = btn if (method == :refresh)
     }
 
-    @graph_type = Gtk::ComboBox.new
+    @graph_type = Gtk::ComboBoxText.new
     ["支出", "収入"].each {|i|
       @graph_type.append_text(i)
     }
@@ -220,15 +221,15 @@ class GraphWindow < DialogWindow
       end
       draw(@year, true)
     }
-    hbox.pack_start(@graph_type, false, false, 10)
+    hbox.pack_start(@graph_type, :expand => false, :fill => false, :padding => 10)
 
     @exceptional = Gtk::CheckButton.new("含特別")
     @exceptional.signal_connect("clicked"){|w|
       draw(@year, true)
     }
-    hbox.pack_start(@exceptional, false, false, 0)
+    hbox.pack_start(@exceptional, :expand => false, :fill => false, :padding => 0)
     @progress = MyProgressBar.new
-    hbox.pack_start(@progress, true, true, 10)
+    hbox.pack_start(@progress, :expand => true, :fill => true, :padding => 10)
     hbox
   end
 end
@@ -260,6 +261,12 @@ class Graph < Gtk::DrawingArea
   LineWidth = 1
   Dash = [1, 2]
 
+  WHITE = [0xff, 0xff, 0xff]
+  BLACK = [0, 0, 0]
+
+  LINE_ON_OFF_DASH = [4, 4]
+  LINE_SOLID = []
+  
   def initialize
     @gc = nil
 
@@ -295,21 +302,14 @@ class Graph < Gtk::DrawingArea
     @caption_y = _('金額')
     @title = ''
 
-    signal_connect("expose_event") {|w, e|
+    signal_connect("draw") {|w, cr|
+      @gc = cr
       draw(@data) if (@data && @data.size > 0)
     }
-
-    modify_fg(Gtk::STATE_NORMAL, self.style.black)
-    modify_bg(Gtk::STATE_NORMAL, self.style.white)
   end
 
   def init
-    @gc = Gdk::GC.new(self.window)
-#   @gc.set_colormap(Gdk::Colormap::system)
-    @gc.set_dashes(0, Dash)
-    COLOR.collect! {|c|
-      Gdk::Color::new(c[0] * COLOR_UNIT, c[1] * COLOR_UNIT, c[2] * COLOR_UNIT)
-    }
+    @gc = nil
   end
 
   def set_title(t)
@@ -368,15 +368,21 @@ class Graph < Gtk::DrawingArea
   end
 
   def draw_frame_rect(color, x1, y1, x2, y2)
-    set_color(color)
+    set_color(COLOR[color % COLOR.size])
     draw_rect(x1, y1, x2, y2, true)
-    set_color(self.style.black)
+    set_color(BLACK)
     draw_rect(x1, y1, x2, y2)
   end
 
   def clear
-    set_color(self.style.white)
+    set_color(WHITE)
     draw_rect(0, 0, allocation.width, allocation.height, true)
+  end
+
+  def create_pango_layout(text)
+    layout = @gc.create_pango_layout
+    layout.set_text(text)
+    layout
   end
 
   def draw_frame
@@ -422,9 +428,9 @@ class Graph < Gtk::DrawingArea
 
   def draw_gauge_y(v)
     y = get_y(v)
-    set_line_style(Gdk::GC::LINE_ON_OFF_DASH)
+    set_line_style(LINE_ON_OFF_DASH)
     draw_line(@left_margin, y, @left_margin + @width, y)
-    set_line_style(Gdk::GC::LINE_SOLID)
+    set_line_style(LINE_SOLID)
     num = create_pango_layout(Commalize(v))
     w, h =  num.pixel_size
     draw_text(@left_margin - w - @num_margin, y - h / 2, num)
@@ -447,29 +453,35 @@ class Graph < Gtk::DrawingArea
   end
 
   def draw_rect(x1, y1, x2, y2, fill = false)
-    self.window.draw_rectangle(@gc, fill, x1, y1, (x2 - x1).abs, (y2 - y1).abs)
+    @gc.rectangle(x1, y1, (x2 - x1).abs, (y2 - y1).abs)
+    if (fill)
+      @gc.fill
+    else
+      @gc.stroke
+    end
   end
 
   def draw_line(x1, y1, x2, y2)
-    self.window.draw_line(@gc, x1, y1, x2, y2)
+    @gc.move_to(x1, y1)
+    @gc.line_to(x2, y2)
+    @gc.stroke
   end
 
   def draw_text(x, y, text)
-    set_color(self.style.black)
-    self.window.draw_layout(@gc, x, y, text)
+    set_color(BLACK)
+    @gc.move_to(x, y)
+    @gc.show_pango_layout(text)
   end
 
   def set_line_style(style)
-    @gc.set_line_attributes(LineWidth, style,
-                            Gdk::GC::CAP_BUTT, Gdk::GC::JOIN_MITER)
+    @gc.line_width = LineWidth
+    @gc.set_dash(style)
+    @gc.line_cap = Cairo::LineCap::BUTT
+    @gc.line_join = Cairo::LineJoin::MITER
   end
  
   def set_color(c)
-    if (c.kind_of?(Numeric))
-      @gc.set_rgb_fg_color(COLOR[c % COLOR.size])
-    elsif (c.kind_of?(Gdk::Color))
-      @gc.set_rgb_fg_color(c)
-    end
+    @gc.set_source_rgb(c[0] / 255.0, c[1] / 255.0, c[2] / 255.0)
   end
 
   def auto_scale(data)

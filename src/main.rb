@@ -25,7 +25,7 @@ USA.
 
 Encoding.default_external = Encoding::UTF_8
 
-require 'gtk2'
+require 'gtk3'
 require 'date'
 require 'fileutils'
 require 'optparse'
@@ -58,15 +58,6 @@ COLUMN_DATA_TITLE = 0
 COLUMN_DATA_ID    = 1
 COLUMN_DATA_TYPE  = 2
 COLUMN_DATA_EDIT  = 3
-
-begin
-  Gdk::Keyval::GDK_KEY_Left
-rescue
-  Gdk::Keyval.constants.each { |c|
-    new_const = c.to_s.sub("GDK_", "GDK_KEY_")
-    Gdk::Keyval.const_set(new_const, Gdk::Keyval.const_get(c))
-  }
-end
 
 require "util"
 require "raif"
@@ -126,7 +117,7 @@ OptionParser.new {|opt|
 
 Raif = Raif_ui.new(ARGV[0])
 
-def err_message(str, parent = Raif, type = Gtk::MessageDialog::ERROR, title = "Error")
+def err_message(str, parent = Raif, type = Gtk::MessageType::ERROR, title = "Error")
   Raif.err_message(str, parent, type, title)
 end
 

@@ -5,7 +5,7 @@ class DialogWindow < Gtk::Window
   attr_reader :geometry
 
   def initialize(parent, data)
-    super(Gtk::Window::TOPLEVEL)
+    super(Gtk::Window::Type::TOPLEVEL)
     @parent = parent
     @zaif_data = data
     set_icon(Icon)
@@ -34,7 +34,7 @@ class DialogWindow < Gtk::Window
   def hide
     return unless (self.visible?)
     save_geometry
-    self.hide_all
+    super()
   end
 
   private
@@ -52,7 +52,7 @@ class SummaryWindow < DialogWindow
   Label_this_month = ' 今月 '
   def initialize(parent, data, has_year_btn = false, has_progress = false)
     super(parent, data)
-    @vbox =Gtk::VBox.new
+    @vbox =Gtk::Box.new(:vertical, 0)
     @year = nil
     @month = nil
     @updating = false
@@ -67,12 +67,12 @@ class SummaryWindow < DialogWindow
 
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_W, Gdk::Keyval::GDK_KEY_w
-        hide if ((e.state & Gdk::Window::CONTROL_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
+        hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
       end
     }
 
-    @vbox.pack_end(create_btns(has_year_btn, has_progress), false, false, 0)
+    @vbox.pack_end(create_btns(has_year_btn, has_progress), :expand => false, :fill => false, :padding => 0)
     add(@vbox)
   end
 
@@ -176,7 +176,7 @@ class SummaryWindow < DialogWindow
   end
 
   def create_btns(has_year_btn, has_progress)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     [
      [Gtk::Stock::GO_BACK,    :show_prev,      :pack_start, :@prev_btn],
@@ -184,18 +184,18 @@ class SummaryWindow < DialogWindow
      [Gtk::Stock::GO_FORWARD, :show_next,      :pack_start, :@next_btn],
      [Gtk::Stock::CLOSE,      :hide,           :pack_end,   :@close_btn],
     ].each {|(stock, func, pack, val)|
-      btn = Gtk::Button.new(stock)
+      btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => stock)
       instance_variable_set(val, btn) if (val)
       btn.signal_connect('clicked') {|w|
         send(func)
       }
-      hbox.send(pack, btn, false, false, 0)
+      hbox.send(pack, btn, :expand => false, :fill => false, :padding => 0)
     }
 
     if (has_year_btn)
-      hb = Gtk::HBox.new
+      hb = Gtk::Box.new(:horizontal, 0)
       @cb_year = MonthYearComboBox.new
-      hb.pack_end(@cb_year, false, false, 0)
+      hb.pack_end(@cb_year, :expand => false, :fill => false, :padding => 0)
       @cb_year.signal_connect("changed") {|w|
         set_expand
         show_data(@year, @month)
@@ -205,12 +205,12 @@ class SummaryWindow < DialogWindow
           @today_btn.label = Label_this_month
         end
       }
-      hbox.pack_start(hb, false, false, 10)
+      hbox.pack_start(hb, :expand => false, :fill => false, :padding => 10)
     end
 
     if (has_progress)
       @progress = MyProgressBar.new
-      hbox.pack_start(@progress, true, true, 10)
+      hbox.pack_start(@progress, :expand => true, :fill => true, :padding => 10)
     end
 
     hbox
@@ -248,7 +248,6 @@ class AccountSummaryWindow < SummaryWindow
                  [_('移動'),   :COLUMN_MOVE,      Numeric],
                  [_('不明額'), :COLUMN_ADJUST,    Numeric],
                  [_('繰越'),   :COLUMN_BALANCE,   Numeric],
-                 [_('締日'),   :COLUMN_CLOSE,     Numeric],
                 ].each_with_index {|data, i|
     const_set(data[COLUMN_DATA_ID], i)
     data[COLUMN_DATA_ID] = i
@@ -260,10 +259,10 @@ class AccountSummaryWindow < SummaryWindow
     @tree_view = create_table(@vbox)
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Left
+      when Gdk::Keyval::KEY_Left
         show_prev
         w.signal_emit_stop('key-press-event')
-      when Gdk::Keyval::GDK_KEY_Right
+      when Gdk::Keyval::KEY_Right
         show_next
         w.signal_emit_stop('key-press-event')
       end
@@ -292,14 +291,14 @@ class AccountSummaryWindow < SummaryWindow
     }
 
     tree_view.set_size_request(480, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
@@ -323,7 +322,7 @@ class AccountSummaryWindow < SummaryWindow
     model.clear
     root = nil
     @zaif_data.send(method, y, m) {
-      |account, sum, income, expenses, move, adjustment, balance, date, progress|
+      |account, sum, income, expenses, move, adjustment, balance, progress|
 
       if (progress < 1)
         @progress.show_progress(progress) if (@parent.progress_bar?)
@@ -334,7 +333,6 @@ class AccountSummaryWindow < SummaryWindow
 
       if (account)
         row[COLUMN_ACCOUNT] = account.to_s
-        row[COLUMN_CLOSE]   = date
       else
         root = row
         row[COLUMN_ACCOUNT] = _('小計')
@@ -371,10 +369,10 @@ class CategorySummaryWindow < SummaryWindow
     @tree_view = create_table(@vbox)
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Left
+      when Gdk::Keyval::KEY_Left
         show_prev
         w.signal_emit_stop('key-press-event')
-      when Gdk::Keyval::GDK_KEY_Right
+      when Gdk::Keyval::KEY_Right
         show_next
         w.signal_emit_stop('key-press-event')
       end
@@ -406,14 +404,14 @@ class CategorySummaryWindow < SummaryWindow
     }
 
     tree_view.set_size_request(320, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
@@ -462,7 +460,6 @@ class CategorySummaryWindow < SummaryWindow
 
   def show_data(y, m)
     super
-#    data = [0, 0, 0, 0, 0]
     model = @tree_view.model
     return unless (model)
     @tree_view.model = nil
@@ -606,14 +603,14 @@ class BudgetWindow < SummaryWindow
     tree_view.append_column(column)
 
     tree_view.set_size_request(420, 300)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
@@ -669,7 +666,6 @@ class BudgetWindow < SummaryWindow
 
   def show_data(y, m)
     super
-#    data = [0, 0, 0, 0, 0]
     model = @tree_view.model
     return unless (model)
     @tree_view.model = nil
@@ -759,14 +755,14 @@ class MonthSummaryWindow < SummaryWindow
 
     @tree_view.signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Return
+      when Gdk::Keyval::KEY_Return
         select_item
       end
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
       if (e.kind_of?(Gdk::EventButton))
-        if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
+        if (e.button == 1 && e.event_type == Gdk::EventType::BUTTON2_PRESS)
           select_item
         end
       end
@@ -807,7 +803,7 @@ class MonthSummaryWindow < SummaryWindow
       end
       column.clickable = true
       column.resizable = true
-      column.sort_order = Gtk::SORT_DESCENDING
+      column.sort_order = Gtk::SortType::DESCENDING
       column.sort_column_id = id
       tree_view.append_column(column)
       tree_view.model.set_sort_func(id){|itr1, itr2|
@@ -835,14 +831,14 @@ class MonthSummaryWindow < SummaryWindow
     }
 
     tree_view.set_size_request(600, 400)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
@@ -859,7 +855,7 @@ class MonthSummaryWindow < SummaryWindow
     month = @zaif_data.get_month_data(y, m)
     size = month.size + 1.0
     month.each_with_index {|data, index|
-      @progress.show_progress(index / size) if (index % 10 == 0 && @parent.progress_bar?)
+      @progress.show_progress(index / size) if (index % 10 == 0 && @parent.progress_bar?) #/
       d, i = data
       row = model.append
       row[COLUMN_DAY] = d.date
@@ -932,20 +928,20 @@ class AccountInOutWindow < SummaryWindow
     super(parent, data, true, true)
 
     @account = AccountComboBox.new
-    @vbox.pack_start(@account, false, false, 0)
+    @vbox.pack_start(@account, :expand => false, :fill => false, :padding => 0)
 
     @tree_view = create_table(@vbox)
 
     @tree_view.signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Return
+      when Gdk::Keyval::KEY_Return
         select_item
       end
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
       if (e.kind_of?(Gdk::EventButton))
-        if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
+        if (e.button == 1 && e.event_type == Gdk::EventType::BUTTON2_PRESS)
           select_item
         end
       end
@@ -1001,12 +997,12 @@ class AccountInOutWindow < SummaryWindow
     }
 
     tree_view.set_size_request(600, 400)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
     box.pack_start(scrolled_window)
 
@@ -1046,7 +1042,7 @@ class AccountInOutWindow < SummaryWindow
 
       month.each_with_index {|data, index|
         if (index % 10 == 0 && @parent.progress_bar?)
-          progress = if (n > 1) then (j + 1) / 12.0 else index / size end
+          progress = if (n > 1) then (j + 1) / 12.0 else index / size end #/
           @progress.show_progress(progress) 
         end
 
@@ -1155,14 +1151,14 @@ class ItemSummaryWindow < SummaryWindow
 
     @tree_view.signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Return
+      when Gdk::Keyval::KEY_Return
         select_item
       end
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
       if (e.kind_of?(Gdk::EventButton))
-        if (e.button == 1 && e.event_type == Gdk::EventButton::BUTTON2_PRESS)
+        if (e.button == 1 && e.event_type == Gdk::EventType::BUTTON2_PRESS)
           select_item
         end
       end
@@ -1173,20 +1169,20 @@ class ItemSummaryWindow < SummaryWindow
     frame = Gtk::Frame.new
     @summary_panel.set_alignment(0, 0.5)
     frame.add(@summary_panel)
-    @vbox.pack_start(frame, false, false, 0)
+    @vbox.pack_start(frame, :expand => false, :fill => false, :padding => 0)
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
-    hbox.pack_start(@search_item.widget, true, true, 10)
+    hbox.pack_start(@search_item.widget, :expand => true, :fill => true, :padding => 10)
 
-    @search_btn = Gtk::Button.new(Gtk::Stock::FIND)
+    @search_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::FIND)
     @search_btn.signal_connect('clicked') {|w, e|
       show_data(@year, @month)
     }
 
-    hbox.pack_start(@search_btn, false, false, 10)
+    hbox.pack_start(@search_btn, :expand => false, :fill => false, :padding => 10)
 
-    @vbox.pack_start(hbox, false, false, 10)
+    @vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 10)
 
     set_title(_('項目一覧'))
   end
@@ -1221,14 +1217,15 @@ class ItemSummaryWindow < SummaryWindow
     }
 
     tree_view.set_size_request(600, 400)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.set_size_request(600, 400)
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end

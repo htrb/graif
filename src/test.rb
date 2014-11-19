@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'gtk2'
 
 def build_tree(tree, model, model2)
@@ -21,13 +22,13 @@ end
 Gtk.init
 
 # Create the main window:
-@window = Gtk::Window.new(Gtk::Window::TOPLEVEL)
+@window = Gtk::Window.new(Gtk::Window::Type::TOPLEVEL)
 @window.set_size_request(400, 400)
 @window.signal_connect("delete_event") { Gtk.main_quit }
 @window.set_border_width(5)
 @window.set_title("TreeStore Example");
 
-vbox2 = Gtk::VBox.new(false, 0)
+vbox2 = Gtk::Box.new(:vertical, 0)
 scroller = Gtk::ScrolledWindow.new
 scroller.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC)
 @window.add(vbox2)

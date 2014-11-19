@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 class RaifCSV < Plugin
   def main(d)
-    dialog = Gtk::FileChooserDialog.new("Save CSV",
-                                        @@parent,
-                                        Gtk::FileChooser::ACTION_SAVE,
-                                        nil,
-                                        [Gtk::Stock::CANCEL, Gtk::Dialog::ResponseType::CANCEL],
-                                        [Gtk::Stock::SAVE, Gtk::Dialog::ResponseType::ACCEPT])
+    dialog = Gtk::FileChooserDialog.new(:title => "Save CSV",
+                                        :parent => @@parent,
+                                        :action => :save,
+                                        :buttons => [[Gtk::Stock::CANCEL, :cancel], [Gtk::Stock::SAVE, :accept]])
     dialog.set_do_overwrite_confirmation(true);
 
     path = get_conf("path", ENV['HOME'])
@@ -17,7 +15,7 @@ class RaifCSV < Plugin
     r = dialog.run
     filename = dialog.filename
     dialog.destroy
-    if (r == Gtk::Dialog::ResponseType::ACCEPT) 
+    if (r == :accept) 
       begin
         save_conf("path", File.dirname(filename))
         save_csv(filename, d[0], d[1])

@@ -45,7 +45,7 @@ class Raif_ui < Gtk::Window
   MyIcons.add_default
 
   def initialize(path)
-    super(Gtk::Window::TOPLEVEL)
+    super(Gtk::Window::Type::TOPLEVEL)
 
     @app_conf = GraifConfig.new(CONFIG_FILE)
     @setup_win = nil
@@ -60,8 +60,7 @@ class Raif_ui < Gtk::Window
     @receipt_dialog = nil
     @graph = nil
 
-    @clipboard = Gtk::Clipboard.get(Gdk::Selection::CLIPBOARD)
-
+    @clipboard = Gtk::Clipboard.get('PRIMARY')
 
     @window_group = Gtk::WindowGroup.new
     @window_group.add(self)
@@ -74,19 +73,19 @@ class Raif_ui < Gtk::Window
     @zaif_data = Zaif_data.new
     @zaif_data.read_config
 
-    hbox = Gtk::HBox.new
-    vbox = Gtk::VBox.new
-    vbox_tab = Gtk::VBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
+    vbox = Gtk::Box.new(:vertical, 0)
+    vbox_tab = Gtk::Box.new(:vertical, 0)
 
     create_ui(vbox)
 
     CategoryTreeModel.set_category(@zaif_data.get_root_category)
     AccountTreeModel.set_accouts(@zaif_data.get_accounts)
 
-    @delete_btn = Gtk::Button.new(Gtk::Stock::DELETE)
-    @modify_btn = Gtk::Button.new(Gtk::Stock::APPLY)
-    @append_btn = Gtk::Button.new(Gtk::Stock::NEW)
-    @clear_btn = Gtk::Button.new(Gtk::Stock::CLEAR)
+    @delete_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::DELETE)
+    @modify_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::APPLY)
+    @append_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::NEW)
+    @clear_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::CLEAR)
 
     signal_connect('delete_event'){|w, e|
       close
@@ -142,23 +141,23 @@ class Raif_ui < Gtk::Window
 
     @tree_view.signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Left
-        if ((e.state & Gdk::Window::SHIFT_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_Left
+        if ((e.state & Gdk::ModifierType::SHIFT_MASK).to_i != 0)
           @calendar.prev_month
-        elsif ((e.state & Gdk::Window::MOD1_MASK).to_i != 0)
+        elsif ((e.state & Gdk::ModifierType::MOD1_MASK).to_i != 0)
           @calendar.back
         else
           @calendar.prev_day
         end
-      when Gdk::Keyval::GDK_KEY_Right
-        if ((e.state & Gdk::Window::SHIFT_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_Right
+        if ((e.state & Gdk::ModifierType::SHIFT_MASK).to_i != 0)
           @calendar.next_month
-        elsif ((e.state & Gdk::Window::MOD1_MASK).to_i != 0)
+        elsif ((e.state & Gdk::ModifierType::MOD1_MASK).to_i != 0)
           @calendar.forward
         else
           @calendar.next_day
         end
-      when Gdk::Keyval::GDK_KEY_Delete
+      when Gdk::Keyval::KEY_Delete
         delete_item(@tree_view.selection.selected)
       end
     }
@@ -212,23 +211,23 @@ class Raif_ui < Gtk::Window
     }
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(@tree_view)
 
     @subtotal_panel = SubtotalPanel.new
 
     hbox_btn = create_btns
 
-    vbox.pack_start(scrolled_window, true, true, 0)
-    vbox.pack_start(@subtotal_panel, false, false, 0)
+    vbox.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
+    vbox.pack_start(@subtotal_panel, :expand => false, :fill => false, :padding => 0)
 
     vbox_tab.pack_start(@tab)
-    vbox_tab.pack_start(hbox_btn, false, false, 0)
+    vbox_tab.pack_start(hbox_btn, :expand => false, :fill => false, :padding => 0)
 
-    hbox.pack_start(@calendar, false, false, 0)
+    hbox.pack_start(@calendar, :expand => false, :fill => false, :padding => 0)
     hbox.pack_start(vbox_tab)
-    vbox.pack_start(hbox, false, false, 0)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 0)
 
     add(vbox)
   end
@@ -249,10 +248,10 @@ class Raif_ui < Gtk::Window
     end
 
     w = @ui.get_widget("/MenuBar")
-    vbox.pack_start(w, false, false, 0)
+    vbox.pack_start(w, :expand => false, :fill => false, :padding => 0)
 
     w = @ui.get_widget("/Toolbar")
-    vbox.pack_start(w, false, false, 0)
+    vbox.pack_start(w, :expand => false, :fill => false, :padding => 0)
 
     @tree_view_menu = @ui.get_widget("/Popup")
   end
@@ -516,7 +515,7 @@ class Raif_ui < Gtk::Window
       nil,
      ],
     ].each { |item|
-      action = Gtk::Action.new(item[0], item[1], item[2], item[4])
+      action = Gtk::Action.new(item[0], :label => item[1], :tooltip => item[2], :stock_id => item[4])
       if (item[3])
         action.signal_connect("activate") {
           item[3].call
@@ -779,32 +778,32 @@ class Raif_ui < Gtk::Window
     err_message(str, parent, Gtk::MessageDialog::INFO, "Information")
   end
 
-  def err_message(str, parent = self, type = Gtk::MessageDialog::ERROR, titie = "Error")
-    mes = Gtk::MessageDialog.new(parent,
-                                 Gtk::Dialog::MODAL,
-                                 type,
-                                 Gtk::MessageDialog::BUTTONS_OK,
-                                 str)
+  def err_message(str, parent = self, type = Gtk::MessageType::ERROR, titie = "Error")
+    mes = Gtk::MessageDialog.new(:parent => parent,
+                                 :flags => Gtk::Dialog::Flags::MODAL,
+                                 :type => type,
+                                 :buttons_type => Gtk::MessageDialog::ButtonsType::OK,
+                                 :message => str)
     mes.title = title
     mes.run
     mes.destroy
   end
 
-  def conf_message(str, parent = self, default = true, type = Gtk::MessageDialog::QUESTION)
-    mes = Gtk::MessageDialog.new(parent,
-                                 Gtk::Dialog::MODAL,
-                                 type,
-                                 Gtk::MessageDialog::BUTTONS_YES_NO,
-                                 str)
+  def conf_message(str, parent = self, default = true, type = Gtk::MessageType::QUESTION)
+    mes = Gtk::MessageDialog.new(:parent => parent,
+                                 :flags => Gtk::Dialog::Flags::MODAL,
+                                 :type => type,
+                                 :buttons_type => Gtk::MessageDialog::ButtonsType::YES_NO,
+                                 :message => str)
     if (default)
-      mes.set_default_response(Gtk::MessageDialog::RESPONSE_YES)
+      mes.set_default_response(Gtk::ResponseType::YES)
     else
-      mes.set_default_response(Gtk::MessageDialog::RESPONSE_NO)
+      mes.set_default_response(Gtk::ResponseType::NO)
     end
     mes.title = "Confirm"
     r = mes.run
     mes.destroy
-    r == Gtk::Dialog::RESPONSE_YES
+    r == Gtk::ResponseType::YES
   end
 
   private
@@ -1071,9 +1070,9 @@ class Raif_ui < Gtk::Window
 
   def search_message(str, resonse)
     mes = Gtk::MessageDialog.new(self,
-                                 Gtk::Dialog::MODAL,
-                                 Gtk::MessageDialog::QUESTION,
-                                 Gtk::MessageDialog::BUTTONS_NONE,
+                                 Gtk::Dialog::Flags::MODAL,
+                                 Gtk::MessageType::QUESTION,
+                                 Gtk::MessageDialog::ButtonsType::NONE,
                                  str)
     mes.add_button(Gtk::Stock::CANCEL, SEARCH_CANCEL)
     mes.add_button("最初から", SEARCH_FROM_TOP)
@@ -1114,7 +1113,7 @@ class Raif_ui < Gtk::Window
     tree_view.append_column(column)
 
     tree_view.set_size_request(600, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
 
     tree_view
@@ -1127,28 +1126,29 @@ class Raif_ui < Gtk::Window
   end
 
   def create_btns
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     @delete_btn.sensitive = false
     @modify_btn.sensitive = false
 
     [@delete_btn, @modify_btn, @append_btn].each {|btn|
-      hbox.pack_end(btn, false, false, 0)
+      hbox.pack_end(btn, :expand => false, :fill => false, :padding => 0)
     }
 
-    hbox.pack_end(@clear_btn, false, false, 20)
+    hbox.pack_end(@clear_btn, :expand => false, :fill => false, :padding => 20)
   end
 
   def create_about
     Gtk::AboutDialog.show(self,
-                          {
-                            "program-name" => APP_NAME,
-                            "version" => APP_VERSION,
-                            "copyright" => COPY_RIGHT,
-                            "comments" => "#{APP_NAME} は zaif とデータ互換の家計簿ソフトです",
-                            "authors" => APP_AUTHORS,
-                            "website" => WEBSITE,
-                            "logo" => Icon,
-                          })
+                          :program_name => APP_NAME,
+                          :version => APP_VERSION,
+                          :copyright => COPY_RIGHT,
+                          :comments => "#{APP_NAME} は zaif とデータ互換の家計簿ソフトです",
+                          :authors => APP_AUTHORS,
+                          :website => WEBSITE,
+                          :logo => Icon,
+                          :wrap_license => false,
+                          :license_type => :gpl_3_0
+                          )
   end
 end

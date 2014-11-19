@@ -6,7 +6,6 @@ class SetupWindow < DialogWindow
 
   [
    :COLUMN_ACCOUNT,
-   :COLUMN_CLOSE,
    :COLUMN_CREDIT,
    :COLUMN_ACCOUNT_ID,
   ].each_with_index {|sym, i|
@@ -27,12 +26,12 @@ class SetupWindow < DialogWindow
     self.modal = true
     self.transient_for = parent
 
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
     @tab = create_tab
     @tab_page = 0
-    vbox.pack_start(@tab)
-    vbox.pack_end(create_root_btns, false, false, 4)
+    vbox.pack_start(@tab, :expand => true, :fill => true, :padding => 0)
+    vbox.pack_end(create_root_btns, :expand => false, :fill => false, :padding => 4)
 
     self.title = "#{APP_NAME} setup"
     add(vbox)
@@ -282,11 +281,6 @@ class SetupWindow < DialogWindow
         @parent.err_message("口座名を設定してください", self)
         return false
       end
-    when COLUMN_CLOSE
-      if (val < 1 || val > 31)
-        @parent.err_message("日付が不正です。", self)
-        return false
-      end
     when COLUMN_ACCOUNT_ID
       if (find_account_id(val))
         @parent.err_message("id #{val} は使用済みです。", self)
@@ -317,7 +311,6 @@ class SetupWindow < DialogWindow
 
   def account_set_val(row)
     row[COLUMN_ACCOUNT] = @account_name.text
-    row[COLUMN_CLOSE] = @account_closing.value
     row[COLUMN_CREDIT] = @account_credit.active?
     row[COLUMN_ACCOUNT_ID] = @account_id.value
     @modified = true
@@ -367,14 +360,21 @@ class SetupWindow < DialogWindow
   end
 
   def create_btns(data, pad = 0)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     data.each {|b|
-      btn = Gtk::Button.new(b[1])
+      label = nil
+      stock = nil
+      if (b[1].is_a?(Symbol))
+        stock = b[1]
+      else
+        label = b[1]
+      end
+      btn = Gtk::Button.new(:label => label, :stock_id => stock)
       btn.signal_connect("clicked") {|w|
         send(b[2])
       }
-      hbox.send(b[3], btn, false, false, pad)
+      hbox.send(b[3], btn, :expand => false, :fill => false, :padding => pad)
       instance_variable_set(b[0], btn)
     }
 
@@ -441,28 +441,27 @@ class SetupWindow < DialogWindow
     }
 
     tree_view.set_size_request(200, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.reorderable = true
     tree_view.model.signal_connect("row-deleted") {|w, path1, path2, arg3|
       @modified = true
     }
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
 
   def create_account_table(box)
-    account_tree_model = Gtk::ListStore.new(String, Integer, TrueClass, Integer)
+    account_tree_model = Gtk::ListStore.new(String, TrueClass, Integer)
     tree_view = TreeView.new(account_tree_model)
     @account_renderer = []
     [
       [_("口座"),       COLUMN_ACCOUNT,    :text],
-      [_("締日"),       COLUMN_CLOSE,      :text, true],
       [_("クレジット"), COLUMN_CREDIT,     :active],
       ["id",            COLUMN_ACCOUNT_ID, :text, true],
     ].each {|(title, id, attribute, numeric)|
@@ -493,38 +492,38 @@ class SetupWindow < DialogWindow
     }
 
     tree_view.set_size_request(200, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
     tree_view.reorderable = true
     tree_view.model.signal_connect("row-deleted") {|w, path1, path2, arg3|
       @modified = true
     }
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end
 
   def add_option(vbox, lable_str, *widget)
-    hbox = Gtk::HBox.new
-    hbox.pack_start(MyLabel.new(lable_str), false, false, 0) if (lable_str)
+    hbox = Gtk::Box.new(:horizontal, 0)
+    hbox.pack_start(MyLabel.new(lable_str), :expand => false, :fill => false, :padding => 0) if (lable_str)
     widget.each {|w|
       if (w.instance_of?(Gtk::Entry))
-        hbox.pack_start(w, true, true, 4)
+        hbox.pack_start(w, :expand => true, :fill => true, :padding => 4)
       else
-        hbox.pack_start(w, false, false, 4)
+        hbox.pack_start(w, :expand => false, :fill => false, :padding => 4)
       end
     }
-    vbox.pack_start(hbox, false, false, 10)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 10)
   end
 
   def create_option_page
-    hbox = Gtk::HBox.new(true, 1)
+    hbox = Gtk::Box.new(:horizontal, 1)
 
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
     @path = Gtk::Entry.new
     @path.signal_connect("changed") {|w| @path_modified = true}
@@ -554,9 +553,9 @@ class SetupWindow < DialogWindow
     @show_progress_bar = Gtk::CheckButton.new(_("プログレスバーを表示する"))
     add_option(vbox, nil, @show_progress_bar)
 
-    hbox.pack_start(Gtk::Frame.new.add(vbox))
+    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => 0)
 
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
     @start_of_year = Gtk::SpinButton.new(1, 12, 1)
     @start_of_year.xalign = 1
@@ -585,14 +584,14 @@ class SetupWindow < DialogWindow
     @migemo_cmd = Gtk::Entry.new
     add_option(vbox, _("migemo コマンド:"), @migemo_cmd)
 
-    hbox.pack_start(Gtk::Frame.new.add(vbox))
+    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => 0)
 
     hbox
   end
 
   def create_category_page
-    vbox = Gtk::VBox.new
-    hbox = Gtk::HBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     @category_name = Gtk::Entry.new
     @category_expense = Gtk::CheckButton.new
@@ -600,21 +599,21 @@ class SetupWindow < DialogWindow
     @category_id = Gtk::SpinButton.new(1, 1000, 1)
 
 
-    hbox.pack_start(MyLabel.new(_("分類名")), false, false, 0)
-    hbox.pack_start(@category_name)
+    hbox.pack_start(MyLabel.new(_("分類名")), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@category_name, :expand => true, :fill => true, :padding => 0)
 
-    hbox.pack_start(MyLabel.new("支出"), false, false, 0)
-    hbox.pack_start(@category_expense, false, false, 0)
+    hbox.pack_start(MyLabel.new("支出"), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@category_expense, :expand => false, :fill => false, :padding => 0)
 
-    hbox.pack_start(MyLabel.new("収入"), false, false, 0)
-    hbox.pack_start(@category_income, false, false, 0)
+    hbox.pack_start(MyLabel.new("収入"), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@category_income, :expand => false, :fill => false, :padding => 0)
 
-    hbox.pack_start(MyLabel.new("id"), false, false, 0)
-    hbox.pack_start(@category_id, false, false, 0)
+    hbox.pack_start(MyLabel.new("id"), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@category_id, :expand => false, :fill => false, :padding => 0)
 
     @category_tree = create_category_table(vbox)
 
-    vbox.pack_end(create_category_btns, false, false, 0)
+    vbox.pack_end(create_category_btns, :expand => false, :fill => false, :padding => 0)
 
     @category_child_btn.sensitive = false
     @category_sibling_btn.sensitive = false
@@ -626,25 +625,22 @@ class SetupWindow < DialogWindow
       @category_delete_btn.sensitive = w.selected
     }
 
-    vbox.pack_end(hbox, false, false, 0)
+    vbox.pack_end(hbox, :expand => false, :fill => false, :padding => 0)
   end
 
   def create_account_page
-    vbox = Gtk::VBox.new
-    hbox = Gtk::HBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     @account_name = Gtk::Entry.new
-    @account_closing = Gtk::SpinButton.new(1, 31, 1)
     @account_credit = Gtk::CheckButton.new(_("クレジット"))
     @account_id = Gtk::SpinButton.new(1, 1000, 1)
 
-    hbox.pack_start(MyLabel.new(_("口座名")), false, false, 0)
-    hbox.pack_start(@account_name)
-    hbox.pack_start(MyLabel.new(_("締日")), false, false, 0)
-    hbox.pack_start(@account_closing, false, false, 0)
-    hbox.pack_start(@account_credit, false, false, 10)
-    hbox.pack_start(MyLabel.new("id"), false, false, 0)
-    hbox.pack_start(@account_id, false, false, 0)
+    hbox.pack_start(MyLabel.new(_("口座名")), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@account_name, :expand => true, :fill => true, :padding => 0)
+    hbox.pack_start(@account_credit, :expand => false, :fill => false, :padding => 10)
+    hbox.pack_start(MyLabel.new("id"), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@account_id, :expand => false, :fill => false, :padding => 0)
 
     @account_tree = create_account_table(vbox)
     @account_tree.signal_connect("cursor-changed") {|w|
@@ -655,9 +651,9 @@ class SetupWindow < DialogWindow
       @account_delete_btn.sensitive = w.selected
     }
 
-    vbox.pack_end(create_account_btns, false, false, 0)
+    vbox.pack_end(create_account_btns, :expand => false, :fill => false, :padding => 0)
     @account_delete_btn.sensitive = false
-    vbox.pack_end(hbox, false, false, 0)
+    vbox.pack_end(hbox, :expand => false, :fill => false, :padding => 0)
   end
 
 
@@ -669,7 +665,6 @@ class SetupWindow < DialogWindow
 
   def account_init_value
     @account_name.text = ""
-    @account_closing.value = 31
     @account_credit.active = false
     @account_id.value = get_account_new_id
   end
@@ -699,7 +694,6 @@ class SetupWindow < DialogWindow
     @zaif_data.get_accounts.each {|a|
       row = @account_tree.model.append
       row[COLUMN_ACCOUNT] = a.to_s
-      row[COLUMN_CLOSE] = a.closing
       row[COLUMN_CREDIT] = a.credit
       row[COLUMN_ACCOUNT_ID] = a.to_i - Zaif_config::ID_OFFSET
     }

@@ -36,9 +36,9 @@ class SettingPanel < Gtk::Notebook
   end
 
   def create_expenses_page
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
-    receipt_btn = Gtk::Button.new(_('レシート入力'))
+    receipt_btn = Gtk::Button.new(:label => _('レシート入力'), :mnemonic => nil, :stock_id => nil)
     receipt_btn.signal_connect('clicked') {|w|
       @parent.show_receipt_dialog(@expenses_page_time.to_s, @expenses_page_exceptional.active?)
     }
@@ -50,7 +50,7 @@ class SettingPanel < Gtk::Notebook
   end
 
   def create_income_page
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
     @income_page_time = create_time_input(vbox)
     @income_page_category, @income_page_exceptional = create_category_input(Zaif_category::INCOME, vbox)
@@ -60,29 +60,29 @@ class SettingPanel < Gtk::Notebook
   end
 
   def create_move_page
-    vbox = Gtk::VBox.new
-    hbox = Gtk::HBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     @move_page_from = AccountComboBox.new
     @move_page_to = AccountComboBox.new
 
     @move_page_amount, tmp, tmp2 = create_amount_input(hbox, false, 0)
-    hbox.pack_start(@move_page_from, false, false, PAD)
-    hbox.pack_start(MyLabel.new("->"), false, false, 0)
-    hbox.pack_start(@move_page_to, false, false, PAD)
+    hbox.pack_start(@move_page_from, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(MyLabel.new("->"), :expand => false, :fill => false, :padding => 0)
+    hbox.pack_start(@move_page_to, :expand => false, :fill => false, :padding => PAD)
 
     @move_page_time = create_time_input(vbox)
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
     @move_page_sign, @move_page_fee = create_fee_input(vbox)
     @move_page_memo = create_memo_input(vbox)
     vbox
   end
 
   def create_adjustment_page
-    vbox = Gtk::VBox.new
-    hbox = Gtk::HBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
+    hbox = Gtk::Box.new(:horizontal, 0)
 
-    subtotal = Gtk::Button.new(_("小計"))
+    subtotal = Gtk::Button.new(:label => _("小計"), :mnemonic => nil, :stock_id => nil)
 
     @adjustment_page_missing = Gtk::Entry.new
     @adjustment_page_missing.width_chars = 12
@@ -90,13 +90,13 @@ class SettingPanel < Gtk::Notebook
     @adjustment_page_missing.can_focus = false
     @adjustment_page_missing.xalign = 1
 
-    hbox.pack_start(subtotal, false, false, 10)
-    hbox.pack_start(MyLabel.new(_("不明額")), false, false, PAD)
-    hbox.pack_start(@adjustment_page_missing, false, false, PAD)
+    hbox.pack_start(subtotal, :expand => false, :fill => false, :padding => 10)
+    hbox.pack_start(MyLabel.new(_("不明額")), :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@adjustment_page_missing, :expand => false, :fill => false, :padding => PAD)
 
     @adjustment_page_time = create_time_input(vbox)
     @adjustment_page_amount, @adjustment_page_subtotal, @adjustment_page_account = create_amount_input(vbox)
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
     @adjustment_page_memo = create_memo_input(vbox)
 
     subtotal.signal_connect("clicked") {|w|
@@ -116,7 +116,7 @@ class SettingPanel < Gtk::Notebook
   end
 
   def create_amount_input(paernt, account = true, pad = PAD)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     entry = IntegerEntry.new
     entry.width_chars = 10
     if (account)
@@ -132,58 +132,58 @@ class SettingPanel < Gtk::Notebook
       }
     end
 
-    hbox.pack_start(MyLabel.new(_("金額")), false, false, PAD)
-    hbox.pack_start(cmb, false, false, PAD) if (account)
-    hbox.pack_start(entry, true, true, PAD)
+    hbox.pack_start(MyLabel.new(_("金額")), :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(cmb, :expand => false, :fill => false, :padding => PAD) if (account)
+    hbox.pack_start(entry, :expand => true, :fill => true, :padding => PAD)
     if (account)
-      hbox.pack_start(Gtk::Label.new(_(" 残高:")), false, false, PAD)
-      hbox.pack_start(subtotal, false, false, PAD)
+      hbox.pack_start(Gtk::Label.new(_(" 残高:")), :expand => false, :fill => false, :padding => PAD)
+      hbox.pack_start(subtotal, :expand => false, :fill => false, :padding => PAD)
     end
-    paernt.pack_start(hbox, false, false, pad)
+    paernt.pack_start(hbox, :expand => false, :fill => false, :padding => pad)
 
     [entry, subtotal, cmb]
   end
 
   def create_time_input(paernt, btn = nil)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     t = TimeInput.new(PAD)
-    hbox.pack_start(t, false, false, PAD)
-    hbox.pack_end(btn, false, false, PAD) if (btn)
-    paernt.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(t, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_end(btn, :expand => false, :fill => false, :padding => PAD) if (btn)
+    paernt.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
     t
   end
 
   def create_category_input(type, paernt)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     cmb = CategoryComboBox.new(type, false)
     label = MyLabel.new(_("分類"))
 
     chk = Gtk::CheckButton.new("特別")
 
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(cmb, false, false, PAD)
-    hbox.pack_start(chk, false, false, PAD)
-    paernt.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(cmb, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(chk, :expand => false, :fill => false, :padding => PAD)
+    paernt.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
     [cmb, chk]
   end
 
   def create_memo_input(paernt)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     entry = Memo_entry.new
     label = MyLabel.new(_("メモ"))
 
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(entry, true, true, PAD)
-    paernt.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(entry, :expand => true, :fill => true, :padding => PAD)
+    paernt.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
     entry
   end
 
   def create_fee_input(paernt)
-    hbox = Gtk::HBox.new
-    cmb = Gtk::ComboBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
+    cmb = Gtk::ComboBoxText.new
     entry = IntegerEntry.new
     label = MyLabel.new(_("手数料"))
 
@@ -192,10 +192,10 @@ class SettingPanel < Gtk::Notebook
     cmb.append_text(" + ")
     cmb.active = 0
 
-    hbox.pack_start(label, false, PAD)
-    hbox.pack_start(cmb, false, false, PAD)
-    hbox.pack_start(entry, false, false, PAD)
-    paernt.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(cmb, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(entry, :expand => false, :fill => false, :padding => PAD)
+    paernt.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
     [cmb, entry]
   end

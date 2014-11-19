@@ -26,15 +26,15 @@ class ReceiptDialog < DialogWindow
 
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_W, Gdk::Keyval::GDK_KEY_w
-        cancel if ((e.state & Gdk::Window::CONTROL_MASK).to_i != 0)
+      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
+        cancel if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
       end
     }
 
     @calendar = calendar
     @zaif_data = data
     @exceptional = 
-    @vbox =Gtk::VBox.new
+    @vbox =Gtk::Box.new(:vertical, 0)
     create_input_panel(@vbox)
     @tree_view = create_table(@vbox)
     create_setting_panel(@vbox)
@@ -111,11 +111,11 @@ class ReceiptDialog < DialogWindow
     }
 
     tree_view.set_size_request(200, 200)
-    tree_view.selection.mode = Gtk::SELECTION_SINGLE
+    tree_view.selection.mode = Gtk::SelectionMode::SINGLE
 
     scrolled_window = Gtk::ScrolledWindow.new
-    scrolled_window.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scrolled_window.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
+    scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
     box.pack_start(scrolled_window)
 
@@ -157,44 +157,44 @@ class ReceiptDialog < DialogWindow
   def create_input_panel(box)
     frame = Gtk::Frame.new
     frame.set_shadow_type(Gtk::ShadowType::OUT)
-    vbox = Gtk::VBox.new
+    vbox = Gtk::Box.new(:vertical, 0)
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     @category_cmb = CategoryComboBox.new(Zaif_category::EXPENSE, false)
     label = MyLabel.new(_("分類"))
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@category_cmb, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@category_cmb, :expand => false, :fill => false, :padding => PAD)
 
     label = MyLabel.new(_("メモ"))
     @memo_input = Memo_entry.new
     @memo_input.width_chars = 10
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@memo_input, true, true, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@memo_input, :expand => true, :fill => true, :padding => PAD)
 
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     label = MyLabel.new(_("価格"))
     @expense_input = NumericEntry.new
     @expense_input.width_chars = 8
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@expense_input, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@expense_input, :expand => false, :fill => false, :padding => PAD)
 
     label = MyLabel.new(_("割引"))
     @adjust_input = NumericEntry.new
     @adjust_input.width_chars = 8
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@adjust_input, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@adjust_input, :expand => false, :fill => false, :padding => PAD)
 
     @adjust_percent = Gtk::CheckButton.new('%')
-    hbox.pack_start(@adjust_percent, false, false, PAD)
+    hbox.pack_start(@adjust_percent, :expand => false, :fill => false, :padding => PAD)
 
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
     frame.add(vbox)
 
-    box.pack_start(frame, false, false, 0)
+    box.pack_start(frame, :expand => false, :fill => false, :padding => 0)
 
     create_item_btns(box)
     @delete_btn.sensitive = false
@@ -232,11 +232,11 @@ class ReceiptDialog < DialogWindow
   def create_setting_panel(vbox)
     frame = Gtk::Frame.new
     frame.set_shadow_type(Gtk::ShadowType::OUT)
-    box = Gtk::VBox.new
+    box = Gtk::Box.new(:vertical, 0)
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     @time = TimeInput.new(PAD)
-    hbox.pack_start(@time, false, false, PAD)
+    hbox.pack_start(@time, :expand => false, :fill => false, :padding => PAD)
 
     label = MyLabel.new(_("消費税"))
     @tax_inside = Gtk::RadioButton.new(_("内税"))
@@ -245,50 +245,50 @@ class ReceiptDialog < DialogWindow
     @tax_inside.signal_connect('toggled') {|w|
       update_table
     }
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@tax_outside, false, false, PAD)
-    hbox.pack_start(@tax_inside, false, false, PAD)
-    box.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@tax_outside, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@tax_inside, :expand => false, :fill => false, :padding => PAD)
+    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     @account = AccountComboBox.new
     label = MyLabel.new(_("口座"))
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@account, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@account, :expand => false, :fill => false, :padding => PAD)
     @exceptional = Gtk::CheckButton.new("特別")
-    hbox.pack_start(@exceptional, false, false, PAD)
+    hbox.pack_start(@exceptional, :expand => false, :fill => false, :padding => PAD)
     @tax_label = MyLabel.new("")
-    hbox.pack_start(@tax_label, false, false, PAD)
-    box.pack_start(hbox, false, false, PAD)
+    hbox.pack_start(@tax_label, :expand => false, :fill => false, :padding => PAD)
+    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     @total = Gtk::Entry.new
     @total.editable = false
     @total.can_focus = false
     @total.xalign = 1
     @total.width_chars = 10
     label = MyLabel.new(_("合計"))
-    hbox.pack_start(label, false, false, PAD)
-    hbox.pack_start(@total, false, false, PAD)
+    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
+    hbox.pack_start(@total, :expand => false, :fill => false, :padding => PAD)
 
     @collect_same_category = Gtk::CheckButton.new(_("同じ分類をまとめる"))
-    hbox.pack_start(@collect_same_category, false, false, PAD * 2)
+    hbox.pack_start(@collect_same_category, :expand => false, :fill => false, :padding => PAD * 2)
 
-    box.pack_start(hbox, false, false, PAD)
+    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
 
     frame.add(box)
-    vbox.pack_start(frame, false, false, 0)
+    vbox.pack_start(frame, :expand => false, :fill => false, :padding => 0)
   end
 
   def create_btns(data, pad = 0)
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
 
     data.each {|(val, stock, method, pack)|
-      btn = Gtk::Button.new(stock)
+      btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => stock)
       btn.signal_connect("clicked") {|w|
         send(method)
       }
-      hbox.send(pack, btn, false, false, pad)
+      hbox.send(pack, btn, :expand => false, :fill => false, :padding => PAD)
       instance_variable_set(val, btn)
     }
 
@@ -301,7 +301,7 @@ class ReceiptDialog < DialogWindow
                         [:@setup_cancel_btn, Gtk::Stock::NEW, :append_item, :pack_end],
                         [:@delete_btn, Gtk::Stock::DELETE, :delete_item, :pack_end],
                        ], 10)
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
   end
 
   def create_root_btns(vbox)
@@ -309,7 +309,7 @@ class ReceiptDialog < DialogWindow
                         [:@setup_ok_btn, Gtk::Stock::OK, :ok, :pack_end],
                         [:@setup_cancel_btn, Gtk::Stock::CANCEL, :cancel, :pack_end]
                        ], 10)
-    vbox.pack_start(hbox, false, false, PAD)
+    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
   end
 
   def update_table

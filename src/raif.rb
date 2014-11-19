@@ -107,28 +107,23 @@ class Zaif_category
 end
 
 class Zaif_account
-  attr_reader :credit, :closing
+  attr_reader :credit
 
   def Zaif_account::new_from_data(element)
     id = element.attributes['id'].to_i
     credit = false
     credit = true if (element.attributes['credit'])
     name = ''
-    closing = 31
     element.elements.each('name') {|e|
       name = e.text
     }
-    element.elements.each('closing') {|e|
-      closing = e.text.to_i
-    }
-    Zaif_account.new(id, name, closing, credit)
+    Zaif_account.new(id, name, credit)
   end
 
-  def initialize(id, name, closing, credit = false)
+  def initialize(id, name, credit = false)
     @id = id
     @name = name
     @credit = credit
-    @closing = closing
   end
 
   def to_i
@@ -142,7 +137,7 @@ class Zaif_account
   def xml
     credit = ''
     credit = ' credit="1"' if (@credit)
-    %Q!<account id="#{@id}"#{credit}><name>#{sanitize(@name)}</name><closing>#{@closing}</closing></account>\n!
+    %Q!<account id="#{@id}"#{credit}><name>#{sanitize(@name)}</name></account>\n!
   end
 end
 
@@ -207,8 +202,8 @@ class Zaif_config
     account
   end
 
-  def add_account(id, name, closing, credit = false)
-    @account.push(Zaif_account.new(id, name, closing, credit))
+  def add_account(id, name, credit = false)
+    @account.push(Zaif_account.new(id, name, credit))
   end
 
   def xml
@@ -636,49 +631,37 @@ class Zaif_month
     @modified = true
   end
 
-  def get_account_summary(account, date = nil, time = nil, prev = false, second = false)
+  def get_account_summary(account, date = nil, time = nil)
     @data.each {|day|
-      break if (!prev && date && day.date > date)
+      break if (date && day.date > date)
       day.each {|item|
         ac = account[item.account]
-        break if (!prev && date && day.date == date && time && item.time > time)
+        break if (date && day.date == date && time && item.time > time)
         next unless (ac)
-        closing = ac[5]
-        through = ((closing == 31 &&  second) ||
-                   (closing != 31 && !second && day.date <= closing) ||
-                   (closing != 31 &&  second && day.date >  closing))
         case item.type
         when Zaif_item::TYPE_EXPENSE
-          next if (through)
           account[0][0] -= item.amount
           account[0][2] += item.amount
           account[item.account][0] -= item.amount
           account[item.account][2] += item.amount
         when Zaif_item::TYPE_INCOME
-          next if (through)
           account[0][0] += item.amount
           account[0][1] += item.amount
           account[item.account][0] += item.amount
           account[item.account][1] += item.amount
         when Zaif_item::TYPE_MOVE
-          unless (through)
-            account[item.account][0] -= item.amount
-            account[item.account][3] -= item.amount
-            if (item.fee_sign < 0)
-              account[0][0] -= item.fee
-              account[0][2] += item.fee
-              account[item.account][0] -= item.fee
-              account[item.account][2] += item.fee
-            end
+          account[item.account][0] -= item.amount
+          account[item.account][3] -= item.amount
+          if (item.fee_sign < 0)
+            account[0][0] -= item.fee
+            account[0][2] += item.fee
+            account[item.account][0] -= item.fee
+            account[item.account][2] += item.fee
           end
 
           ac2 = account[item.account_to]
           next unless (ac2)
-          closing2 = ac2[5]
 
-          next if ((closing2 == 31 &&  second) ||
-                   (closing2 != 31 && !second && day.date <= closing2) ||
-                   (closing2 != 31 &&  second && day.date >  closing2))
           account[item.account_to][0] += item.amount
           account[item.account_to][3] += item.amount
           if (item.fee_sign > 0)
@@ -688,7 +671,6 @@ class Zaif_month
             account[item.account_to][1] += item.fee
           end
         when Zaif_item::TYPE_ADJUST
-          next if (through)
           diff = item.amount - account[item.account][0]
           account[0][0] += diff
           account[0][4] += diff
@@ -697,9 +679,6 @@ class Zaif_month
         end
       }
     }
-    unless (second)
-      get_next.get_account_summary(account, date, time, false, true) if (!date || (date && prev))
-    end
   end
 
   def get_prev(recursive = true)
@@ -767,7 +746,7 @@ class Zaif_month
         when Zaif_item::TYPE_INCOME
           summary[item.category][1] += item.amount if (include_exceptional || (! include_exceptional && ! item.exceptional))
         when Zaif_item::TYPE_MOVE
-          # nothing to do becase move fee does not have category.
+          # nothing to do becase move fee does not have a category.
         end
       }
     }
@@ -867,8 +846,8 @@ class Zaif_data
     @config.clear_category
   end
 
-  def add_account(id, name, closing, credit = false)
-    @config.add_account(id, name, closing, credit)
+  def add_account(id, name, credit = false)
+    @config.add_account(id, name, credit)
   end
 
   def get_account_by_id(id)
@@ -887,9 +866,6 @@ class Zaif_data
     month = get_month_data(y, m)
     ac = get_account_by_id(item.account)
     ac2 = get_account_by_id(item.account_to)
-    if ((ac.closing != 31 && ac.closing <= d) || (ac2 && ac2.closing != 31 && ac2.closing <= d))
-      calculate_subtotal(y, month.get_prev.month)
-    end
     calculate_subtotal(y, m)
   end
 
@@ -924,19 +900,19 @@ class Zaif_data
     @config.save
   end
 
-  def get_account_summary_month(y, m, d = nil, t = nil, prev = false, &block)
+  def get_account_summary_month(y, m, d = nil, t = nil, &block)
     month = get_prev_month_data(y, m)
     prev_subtotals = month.subtotals
 
     account = {}
     total = @config.account.inject(0) {|sum, a|
-      account[a.to_i] = [prev_subtotals[a.to_i].to_i, 0, 0, 0, 0, a.closing]
+      account[a.to_i] = [prev_subtotals[a.to_i].to_i, 0, 0, 0, 0]
       sum + prev_subtotals[a.to_i].to_i
     }
     account[0] = [total, 0, 0, 0, 0, 0]
 
     month = get_month_data(y, m)
-    month.get_account_summary(account, d, t, prev)
+    month.get_account_summary(account, d, t)
     subtotals = month.subtotals
 
     s = account[0]
@@ -944,14 +920,14 @@ class Zaif_data
       subtotals[0] = s[1] - s[2]
       month.modified
     end
-    yield(nil, s[0], s[1], s[2], s[3], s[4], total, 0, 1)
+    yield(nil, s[0], s[1], s[2], s[3], s[4], total, 1)
     @config.account.each {|a|
       s = account[a.to_i]
       if (!d && !t && a.to_i > 0 && subtotals[a.to_i] != s[0])
         subtotals[a.to_i] = s[0]
         month.modified
       end
-      yield(a, s[0], s[1], s[2], s[3], s[4], prev_subtotals[a.to_i].to_i, a.closing, 1)
+      yield(a, s[0], s[1], s[2], s[3], s[4], prev_subtotals[a.to_i].to_i, 1)
     }
     month
   end
@@ -961,7 +937,7 @@ class Zaif_data
 
     prev_subtotals = get_prev_month_data(y, 1 + start).subtotals
     @config.account.each {|a|
-      data[a.to_i] = [0, 0, 0, 0, 0, prev_subtotals[a.to_i].to_i, a.closing]
+      data[a.to_i] = [0, 0, 0, 0, 0, prev_subtotals[a.to_i].to_i]
     }
     (1..12).each {|m|
       get_account_summary_month(y, m + start) {
@@ -978,12 +954,12 @@ class Zaif_data
           data[a] = [sum, income, expenses, move, adjustment, balance, date]
         end
       }
-      yield(nil, nil, nil, nil, nil, nil, nil, nil, (m - 1)/12.0)
+      yield(nil, nil, nil, nil, nil, nil, nil, (m - 1)/12.0)
     }
-    yield(nil, data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[0][6], 1)
+    yield(nil, data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], 1)
     @config.account.each {|a|
       v = data[a.to_i]
-      yield(a, v[0], v[1], v[2], v[3], v[4], v[5], v[6], 1)
+      yield(a, v[0], v[1], v[2], v[3], v[4], v[5], 1)
     }
   end
 
@@ -1044,8 +1020,6 @@ class Zaif_data
   end
 
   def get_category_summary_year(y, start = 0, include_exceptional = true, &block)
-#    data = [0, 0, 0, 0, 0]
-#    summary = {}
     (1..12).inject({}) {|summary ,m|
       get_category_summary(y, m + start, include_exceptional).each {|k, v|
         c = get_category_by_id(k, false, false, false)
@@ -1082,22 +1056,11 @@ class Zaif_data
 
   def get_account_summation(aid, y, m, d, t)
     sum = 0
-    prev = false
 
     a = @config.get_account_by_id(aid, false)
     return 0 unless (a)
 
-    if (a.closing != 31 && d <= a.closing)
-      prev = true
-      if (m == 1)
-        y -= 1
-        m = 12
-      else
-        m -= 1
-      end
-    end
-
-    get_account_summary_month(y, m, d, t, prev) {|account, s, *parm|
+    get_account_summary_month(y, m, d, t) {|account, s, *parm|
       sum = s if (aid == account.to_i)
     }
     sum

@@ -3,11 +3,13 @@
 
 class GotoDialog < Gtk::Dialog
   def initialize(parent)
-    super("移動",
-          parent,
-          Gtk::Dialog::MODAL,
-          [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
-          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK]
+    super(:title => "移動",
+          :parent => parent,
+          :flags => Gtk::Dialog::Flags::MODAL,
+          :buttons => [
+            [Gtk::Stock::CANCEL, Gtk::ResponseType::CANCEL],
+            [Gtk::Stock::OK, Gtk::ResponseType::OK]
+          ]
           )
     
     signal_connect("delete-event") {|w, e|
@@ -22,31 +24,31 @@ class GotoDialog < Gtk::Dialog
 
     @month.signal_connect("value-changed") {|w|
       if (w.value > 12)
-        @year.spin(Gtk::SpinButton::STEP_FORWARD, 1)
+        @year.spin(Gtk::SpinButton::Type::STEP_FORWARD, 1)
         w.value = 1
       elsif(w.value < 1)
-        @year.spin(Gtk::SpinButton::STEP_BACKWARD, 1)
+        @year.spin(Gtk::SpinButton::Type::STEP_BACKWARD, 1)
         w.value = 12
       end
     }
 
     return_key_pressed = proc {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_Return
-        response(Gtk::Dialog::RESPONSE_OK)
+      when Gdk::Keyval::KEY_Return
+        response(Gtk::ResponseType::OK)
       end
     }
 
-    hbox = Gtk::HBox.new
+    hbox = Gtk::Box.new(:horizontal, 0)
     [
       [@year, '年'],
       [@month, '月'],
     ].each {|(widget, title)|
-      hbox.pack_start(widget, false, false, 10)
-      hbox.pack_start(Gtk::Label.new(title), false, false, 0)
+      hbox.pack_start(widget, :expand => false, :fill => false, :padding => 10)
+      hbox.pack_start(Gtk::Label.new(title), :expand => false, :fill => false, :padding => 0)
       widget.signal_connect("key-press-event", &return_key_pressed)
     }
-    self.vbox.pack_start(hbox, false, false, 10)
+    self.child.pack_start(hbox, :expand => false, :fill => false, :padding => 10)
   end
 
   def run(y, m, &block)
@@ -55,7 +57,7 @@ class GotoDialog < Gtk::Dialog
     @month.grab_focus
     show_all
     super() {|r|
-      yield(r == Gtk::Dialog::RESPONSE_OK, @year.value.to_i, @month.value.to_i)
+      yield(r == Gtk::ResponseType::OK, @year.value.to_i, @month.value.to_i)
     }
     hide
   end

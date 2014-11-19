@@ -89,7 +89,7 @@ class IntegerEntry < NumericEntry
   end
 end
 
-class MonthYearComboBox < Gtk::ComboBox
+class MonthYearComboBox < Gtk::ComboBoxText
   def initialize
     super
     ["月", "年"].each {|i|
@@ -173,9 +173,9 @@ class AccountComboBox < Gtk::ComboBox
   end
 
   def initialize
-    super(AccountTreeModel.new)
+    super(:entry => false, :model => AccountTreeModel.new, :area => nil)
     renderer_s = Gtk::CellRendererText.new
-    pack_start(renderer_s, true)
+    pack_start(renderer_s, :expand => true, :fill => true, :padding => 0)
     set_attributes(renderer_s, :text => AccountTreeModel::COLUMN_NAME)
     Instances.push(self)
     update(0)
@@ -312,10 +312,10 @@ class CategoryComboBox < Gtk::ComboBox
   end
 
   def initialize(type, add_root = false)
-    super(CategoryTreeModel.new(type, add_root))
+    super(:entry => false, :model => CategoryTreeModel.new(type, add_root), :area => nil)
 
     renderer_s = Gtk::CellRendererText.new
-    pack_start(renderer_s, true)
+    pack_start(renderer_s, :expand => true, :fill => true, :padding => 0)
     set_attributes(renderer_s, :text => CategoryTreeModel::COLUMN_NAME)
     Instances.push(self)
     update(0, add_root)
@@ -401,6 +401,7 @@ class Gtk::Calendar
     super
     @delete_forward_history = true
     @save_history = true
+    set_detail_width_chars(4)
     signal_connect("day_selected") {|w|
       if (w.date != History[-1] && @save_history)
         History.push(w.date)
@@ -544,9 +545,9 @@ class Gtk::Calendar
   end
 end
 
-class TimeInput < Gtk::HBox
+class TimeInput < Gtk::Box
   def initialize(pad = 4)
-    super()
+    super(:horizontal, 0)
     t = Time.new
 
     @hour = Gtk::SpinButton.new(0, 23, 1)
@@ -572,7 +573,7 @@ class TimeInput < Gtk::HBox
     @min.signal_connect("value-changed") {|w|
       if (w.value > 59)
         if (@hour.value < 23)
-          @hour.spin(Gtk::SpinButton::STEP_FORWARD, 1)
+          @hour.spin(Gtk::SpinButton::Type::STEP_FORWARD, 1)
           w.value = 0
           w.set_range(-1, 60)
         else
@@ -581,7 +582,7 @@ class TimeInput < Gtk::HBox
         end
       elsif(w.value < 0)
         if (@hour.value > 0)
-          @hour.spin(Gtk::SpinButton::STEP_BACKWARD, 1)
+          @hour.spin(Gtk::SpinButton::Type::STEP_BACKWARD, 1)
           w.value = 59
           w.set_range(-1, 60)
         else
@@ -591,10 +592,10 @@ class TimeInput < Gtk::HBox
       end
     }
 
-    self.pack_start(MyLabel.new(_("時刻")), false, false, pad)
-    self.pack_start(@hour, false, false, pad)
-    self.pack_start(Gtk::Label.new(":"), false, false, pad)
-    self.pack_start(@min, false, false, pad)
+    self.pack_start(MyLabel.new(_("時刻")), :expand => false, :fill => false, :padding => pad)
+    self.pack_start(@hour,                  :expand => false, :fill => false, :padding => pad)
+    self.pack_start(Gtk::Label.new(":"),    :expand => false, :fill => false, :padding => pad)
+    self.pack_start(@min,                   :expand => false, :fill => false, :padding => pad)
   end
 
   def to_s
@@ -625,11 +626,11 @@ class SubtotalPanel < Gtk::Frame
 
     self.set_shadow_type(Gtk::ShadowType::ETCHED_OUT)
 
-    hbox = Gtk::HBox.new(false, 10)
+    hbox = Gtk::Box.new(:horizontal, 10)
     hbox.border_width = 4
 
     @date = MyLabel.new("")
-    hbox.pack_start(@date, false, false, 0)
+    hbox.pack_start(@date, :expand => false, :fill => false, :padding => 0)
 
     [
       [:@income, _("収入:")],
@@ -637,10 +638,10 @@ class SubtotalPanel < Gtk::Frame
       [:@subtotal, _("小計:")]
     ].each {|val, title|
       label = instance_variable_set(val, Gtk::Label.new(""))
-      hb = Gtk::HBox.new
-      hb.pack_start(MyLabel.new(title), false, false, 0)
-      hb.pack_start(label, false, false, 0)
-      hbox.pack_start(hb, false, false, 0)
+      hb = Gtk::Box.new(:horizontal, 0)
+      hb.pack_start(MyLabel.new(title), :expand => false, :fill => false, :padding => 0)
+      hb.pack_start(label, :expand => false, :fill => false, :padding => 0)
+      hbox.pack_start(hb, :expand => false, :fill => false, :padding => 0)
     }
 
     self.add(hbox)
@@ -674,7 +675,7 @@ class TreeView < Gtk::TreeView
 
     signal_connect("key-press-event") {|w, e|
       case (e.keyval)
-      when Gdk::Keyval::GDK_KEY_space
+      when Gdk::Keyval::KEY_space
         toggle_expand(w.selection.selected)
       end
     }
