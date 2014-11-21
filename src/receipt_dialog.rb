@@ -16,8 +16,6 @@ class ReceiptDialog < DialogWindow
 
   COLUMN_CATEGORY_ID = COLUMN_DATA.size
 
-  PAD = 2
-
   def initialize(parent, data, calendar)
     super(parent, data)
     self.modal = true
@@ -154,43 +152,55 @@ class ReceiptDialog < DialogWindow
     row[COLUMN_SUBTOTAL] = 0
   end
 
+  def add_margin(w)
+    w.set_margin_top(PAD)
+    w.set_margin_bottom(PAD)
+  end
+
+  def add_hmargin(w)
+    w.set_margin_start(PAD)
+    w.set_margin_end(PAD)
+  end
+
   def create_input_panel(box)
     frame = Gtk::Frame.new
     frame.set_shadow_type(Gtk::ShadowType::OUT)
-    vbox = Gtk::Box.new(:vertical, 0)
+    vbox = Gtk::Grid.new
+    add_hmargin(vbox)
 
     hbox = Gtk::Box.new(:horizontal, 0)
     @category_cmb = CategoryComboBox.new(Zaif_category::EXPENSE, false)
+    add_margin(@category_cmb)
     label = MyLabel.new(_("分類"))
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@category_cmb, :expand => false, :fill => false, :padding => PAD)
+    vbox.attach(label, 0, 0, 1, 1)
+    vbox.attach(@category_cmb, 1, 0, 1, 1)
 
     label = MyLabel.new(_("メモ"))
     @memo_input = Memo_entry.new
     @memo_input.width_chars = 10
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@memo_input, :expand => true, :fill => true, :padding => PAD)
-
-    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
-
+    @memo_input.hexpand = true
+    add_margin(@memo_input)
+    vbox.attach(label, 2, 0, 1, 1)
+    vbox.attach(@memo_input, 3, 0, 2, 1)
 
     hbox = Gtk::Box.new(:horizontal, 0)
     label = MyLabel.new(_("価格"))
     @expense_input = NumericEntry.new
     @expense_input.width_chars = 8
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@expense_input, :expand => false, :fill => false, :padding => PAD)
+    add_margin(@expense_input)
+    vbox.attach(label, 0, 1, 1, 1)
+    vbox.attach(@expense_input, 1, 1, 1, 1)
 
     label = MyLabel.new(_("割引"))
     @adjust_input = NumericEntry.new
     @adjust_input.width_chars = 8
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@adjust_input, :expand => false, :fill => false, :padding => PAD)
+    @adjust_input.hexpand = false
 
     @adjust_percent = Gtk::CheckButton.new('%')
-    hbox.pack_start(@adjust_percent, :expand => false, :fill => false, :padding => PAD)
-
-    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
+    @adjust_percent.hexpand = true
+    vbox.attach(label, 2, 1, 1, 1)
+    vbox.attach(@adjust_input, 3, 1, 1, 1)
+    vbox.attach(@adjust_percent, 4, 1, 1, 1)
 
     frame.add(vbox)
 
@@ -232,11 +242,13 @@ class ReceiptDialog < DialogWindow
   def create_setting_panel(vbox)
     frame = Gtk::Frame.new
     frame.set_shadow_type(Gtk::ShadowType::OUT)
-    box = Gtk::Box.new(:vertical, 0)
+    box = Gtk::Grid.new
+    add_margin(box)
+    add_hmargin(box)
 
     hbox = Gtk::Box.new(:horizontal, 0)
-    @time = TimeInput.new(PAD)
-    hbox.pack_start(@time, :expand => false, :fill => false, :padding => PAD)
+    @time = TimeInput.new
+    box.attach(@time, 0, 0, 1, 3)
 
     label = MyLabel.new(_("消費税"))
     @tax_inside = Gtk::RadioButton.new(_("内税"))
@@ -245,21 +257,26 @@ class ReceiptDialog < DialogWindow
     @tax_inside.signal_connect('toggled') {|w|
       update_table
     }
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
     hbox.pack_start(@tax_outside, :expand => false, :fill => false, :padding => PAD)
     hbox.pack_start(@tax_inside, :expand => false, :fill => false, :padding => PAD)
-    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
+    add_margin(hbox)
+
+    box.attach(label, 1, 0, 1, 1)
+    box.attach(hbox, 2, 0, 1, 1)
 
     hbox = Gtk::Box.new(:horizontal, 0)
     @account = AccountComboBox.new
+    add_margin(@account)
     label = MyLabel.new(_("口座"))
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@account, :expand => false, :fill => false, :padding => PAD)
+    box.attach(label, 1, 1, 1, 1)
+    box.attach(@account, 2, 1, 1, 1)
+
     @exceptional = Gtk::CheckButton.new("特別")
-    hbox.pack_start(@exceptional, :expand => false, :fill => false, :padding => PAD)
+    add_hmargin(@exceptional)
+    add_margin(@exceptional)
+    box.attach(@exceptional, 3, 1, 1, 1)
     @tax_label = MyLabel.new("")
-    hbox.pack_start(@tax_label, :expand => false, :fill => false, :padding => PAD)
-    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
+    box.attach(@tax_label, 4, 1, 1, 1)
 
     hbox = Gtk::Box.new(:horizontal, 0)
     @total = Gtk::Entry.new
@@ -267,14 +284,14 @@ class ReceiptDialog < DialogWindow
     @total.can_focus = false
     @total.xalign = 1
     @total.width_chars = 10
+    add_margin(@total)
     label = MyLabel.new(_("合計"))
-    hbox.pack_start(label, :expand => false, :fill => false, :padding => PAD)
-    hbox.pack_start(@total, :expand => false, :fill => false, :padding => PAD)
+    box.attach(label, 1, 2, 1, 1)
+    box.attach(@total, 2, 2, 1, 1)
 
     @collect_same_category = Gtk::CheckButton.new(_("同じ分類をまとめる"))
-    hbox.pack_start(@collect_same_category, :expand => false, :fill => false, :padding => PAD * 2)
-
-    box.pack_start(hbox, :expand => false, :fill => false, :padding => PAD)
+    add_hmargin(@collect_same_category)
+    box.attach(@collect_same_category, 3, 2, 2, 1)
 
     frame.add(box)
     vbox.pack_start(frame, :expand => false, :fill => false, :padding => 0)

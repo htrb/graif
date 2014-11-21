@@ -1,3 +1,8 @@
+2014-11-20  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/util.rb (TimeInput#initialize): add second parameter.
+	(TimeInput#initialize): set "hexpand" and "max_width_chars".
+
 2012-08-19  Hajimu UMEMOTO
 
 	* configure.in: check "ruby19".

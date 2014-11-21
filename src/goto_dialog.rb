@@ -21,6 +21,8 @@ class GotoDialog < Gtk::Dialog
     @month = Gtk::SpinButton.new(0, 13, 1)
     @year.xalign = 1
     @month.xalign = 1
+    @year.orientation = :vertical
+    @month.orientation = :vertical
 
     @month.signal_connect("value-changed") {|w|
       if (w.value > 12)

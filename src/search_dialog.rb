@@ -3,7 +3,9 @@
 
 class SearchWidget
   def initialize
-    @vbox =Gtk::Box.new(:vertical, 0)
+    @vbox = Gtk::Grid.new
+    @vbox.set_margin_start(PAD)
+    @vbox.set_margin_end(PAD)
 
     @memo = Memo_entry.new
     @memo.activates_default = true
@@ -21,12 +23,18 @@ class SearchWidget
       [@rb_memo, @memo, true],
       [@rb_account, @account, false],
       [@rb_category, @category, false]
-    ].each {|(widget, val, pack)|
-      hbox = Gtk::Box.new(:horizontal, 0)
-      hbox.pack_start(widget, :expand => false, :fill => false, :padding => 0)
-      hbox.pack_start(val, :expand => pack, :fill => pack, :padding => 0)
-      @vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 4)
+    ].each_with_index {|(widget, val, pack), i|
+      @vbox.attach(widget, 0, i, 1, 1)
+      @vbox.attach(val,    1, i, 1, 1)
+      val.set_margin_top(PAD)
+      val.set_margin_bottom(PAD)
+      if (pack)
+        val.halign = :fill
+      else
+        val.halign = :start
+      end
       val.sensitive = false
+      val.hexpand = pack
       widget.signal_connect("toggled") {|w|
         if (w.active?)
           @search_type = w.group.index(w)

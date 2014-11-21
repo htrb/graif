@@ -509,31 +509,35 @@ class SetupWindow < DialogWindow
 
   def add_option(vbox, lable_str, *widget)
     hbox = Gtk::Box.new(:horizontal, 0)
-    hbox.pack_start(MyLabel.new(lable_str), :expand => false, :fill => false, :padding => 0) if (lable_str)
     widget.each {|w|
       if (w.instance_of?(Gtk::Entry))
         hbox.pack_start(w, :expand => true, :fill => true, :padding => 4)
+        hbox.hexpand = true
       else
         hbox.pack_start(w, :expand => false, :fill => false, :padding => 4)
       end
+      w.set_margin_top(PAD)
+      w.set_margin_bottom(PAD)
     }
-    vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 10)
+
+    if (lable_str)
+      vbox.attach(MyLabel.new(lable_str), 0, @row, 1, 1)
+      vbox.attach(hbox, 1, @row, 1, 1)
+    else
+      vbox.attach(hbox, 0, @row, 2, 1)
+    end
+    @row += 1
   end
 
   def create_option_page
     hbox = Gtk::Box.new(:horizontal, 1)
 
-    vbox = Gtk::Box.new(:vertical, 0)
+    vbox = Gtk::Grid.new
 
+    @row = 0
     @path = Gtk::Entry.new
     @path.signal_connect("changed") {|w| @path_modified = true}
     add_option(vbox, _("データ保存先:"), @path)
-
-    @rb_commalize_n = Gtk::RadioButton.new(_("3"))
-    add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(@rb_commalize_n, _("4")))
-
-    @rb_commalize_sep = Gtk::RadioButton.new(_(","))
-    add_option(vbox, _("数値区切文字:"), @rb_commalize_sep, Gtk::RadioButton.new(@rb_commalize_sep, _(".")))
 
     @calc_subtotal_every_time = Gtk::CheckButton.new(_("その日時の残高を表示する"))
     add_option(vbox, nil, @calc_subtotal_every_time)
@@ -553,10 +557,17 @@ class SetupWindow < DialogWindow
     @show_progress_bar = Gtk::CheckButton.new(_("プログレスバーを表示する"))
     add_option(vbox, nil, @show_progress_bar)
 
-    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => 0)
+    @use_migemo = Gtk::CheckButton.new(_("migemo を使う"))
+    add_option(vbox, nil, @use_migemo)
 
-    vbox = Gtk::Box.new(:vertical, 0)
+    @migemo_cmd = Gtk::Entry.new
+    add_option(vbox, _("migemo コマンド:"), @migemo_cmd)
 
+    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => PAD)
+
+    vbox = Gtk::Grid.new
+
+    @row = 0
     @start_of_year = Gtk::SpinButton.new(1, 12, 1)
     @start_of_year.xalign = 1
     add_option(vbox, _("年度の始まり:"), @start_of_year, Gtk::Label.new(_('月')))
@@ -564,6 +575,12 @@ class SetupWindow < DialogWindow
     @consumption_tax = Gtk::SpinButton.new(0, 100, 1)
     @consumption_tax.xalign = 1
     add_option(vbox, _("消費税:"), @consumption_tax, Gtk::Label.new('%'))
+
+    @rb_commalize_n = Gtk::RadioButton.new(_("3"))
+    add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(@rb_commalize_n, _("4")))
+
+    @rb_commalize_sep = Gtk::RadioButton.new(_(","))
+    add_option(vbox, _("数値区切文字:"), @rb_commalize_sep, Gtk::RadioButton.new(@rb_commalize_sep, _(".")))
 
     @graph_include_income = Gtk::CheckButton.new(_("支出グラフの計算に収入を含める"))
     add_option(vbox, nil, @graph_include_income)
@@ -578,13 +595,7 @@ class SetupWindow < DialogWindow
     @history_size.xalign = 1
     add_option(vbox, _("履歴の数:"), @history_size)
 
-    @use_migemo = Gtk::CheckButton.new(_("migemo を使う"))
-    add_option(vbox, nil, @use_migemo)
-
-    @migemo_cmd = Gtk::Entry.new
-    add_option(vbox, _("migemo コマンド:"), @migemo_cmd)
-
-    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => 0)
+    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => false, :fill => false, :padding => PAD)
 
     hbox
   end

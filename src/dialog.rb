@@ -1171,18 +1171,23 @@ class ItemSummaryWindow < SummaryWindow
     frame.add(@summary_panel)
     @vbox.pack_start(frame, :expand => false, :fill => false, :padding => 0)
 
-    hbox = Gtk::Box.new(:horizontal, 0)
+#    hbox = Gtk::Box.new(:horizontal, 0)
 
-    hbox.pack_start(@search_item.widget, :expand => true, :fill => true, :padding => 10)
+#    hbox.pack_start(@search_item.widget, :expand => true, :fill => true, :padding => 10)
 
     @search_btn = Gtk::Button.new(:label => nil, :mnemonic => nil, :stock_id => Gtk::Stock::FIND)
+    @search_btn.set_margin_start(PAD)
+    @search_btn.set_margin_end(PAD)
+    @search_btn.set_margin_top(PAD)
+    @search_btn.set_margin_bottom(PAD)
     @search_btn.signal_connect('clicked') {|w, e|
       show_data(@year, @month)
     }
 
-    hbox.pack_start(@search_btn, :expand => false, :fill => false, :padding => 10)
+    @search_item.widget.attach(@search_btn, 2, 0, 1, 3)
+#    hbox.pack_start(@search_btn, :expand => false, :fill => false, :padding => 10)
 
-    @vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 10)
+    @vbox.pack_start(@search_item.widget, :expand => false, :fill => false, :padding => 10)
 
     set_title(_('項目一覧'))
   end

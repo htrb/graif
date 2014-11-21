@@ -58,6 +58,7 @@ COLUMN_DATA_TITLE = 0
 COLUMN_DATA_ID    = 1
 COLUMN_DATA_TYPE  = 2
 COLUMN_DATA_EDIT  = 3
+PAD = 4
 
 require "util"
 require "raif"

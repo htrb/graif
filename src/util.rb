@@ -40,6 +40,7 @@ class MyLabel < Gtk::Label
   def initialize(s, f = false)
     super(s, f)
     self.xpad = 10
+    self.xalign = 0
   end
 end
 
@@ -545,10 +546,11 @@ class Gtk::Calendar
   end
 end
 
-class TimeInput < Gtk::Box
-  def initialize(pad = 4, label = true)
-    super(:horizontal, 0)
+class TimeInput < Gtk::Grid
+  def initialize
+    super
     self.hexpand = false
+    self.valign = :center
 
     t = Time.new
 
@@ -559,6 +561,7 @@ class TimeInput < Gtk::Box
     @hour.max_width_chars = 2
     @hour.max_length = 2
     @hour.value = t.hour
+    @hour.orientation = :vertical
 
     @min  = Gtk::SpinButton.new(-1, 60, 1)
     @min.xalign = 1
@@ -567,6 +570,7 @@ class TimeInput < Gtk::Box
     @min.max_width_chars = 2
     @min.max_length = 2
     @min.value = t.min
+    @min.orientation = :vertical
 
     @hour.signal_connect("value-changed") {|w|
       if (w.value > 0 && w.value < 23)
@@ -596,10 +600,14 @@ class TimeInput < Gtk::Box
       end
     }
 
-    self.pack_start(MyLabel.new(_("時刻")), :expand => false, :fill => false, :padding => pad) if (label)
-    self.pack_start(@hour,                  :expand => false, :fill => false, :padding => pad)
-    self.pack_start(Gtk::Label.new(":"),    :expand => false, :fill => false, :padding => pad)
-    self.pack_start(@min,                   :expand => false, :fill => false, :padding => pad)
+    label = MyLabel.new(_("時刻"))
+    attach(label, 0, 0, 1, 1)
+    attach(@hour, 1, 0, 1, 1)
+    label = Gtk::Label.new(":")
+    label.set_margin_start(PAD)
+    label.set_margin_end(PAD)
+    attach(label, 2, 0, 1, 1)
+    attach(@min, 3, 0, 1, 1)
   end
 
   def to_s

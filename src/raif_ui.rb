@@ -355,6 +355,12 @@ class Raif_ui < Gtk::Window
       Gtk::Stock::FIND,
      ],
      [
+      "EditSearchNextAction",
+      _("_Search next"),
+      _("Search next"),
+      proc{search_forward},
+     ],
+     [
       "SettingPreferenceAction",
       _("_Preference"),
       _("Preference"),
@@ -1069,11 +1075,11 @@ class Raif_ui < Gtk::Window
   end
 
   def search_message(str, resonse)
-    mes = Gtk::MessageDialog.new(self,
-                                 Gtk::Dialog::Flags::MODAL,
-                                 Gtk::MessageType::QUESTION,
-                                 Gtk::MessageDialog::ButtonsType::NONE,
-                                 str)
+    mes = Gtk::MessageDialog.new(:parent => self,
+                                 :flags => :modal,
+                                 :type => :question,
+                                 :buttons_type => :none,
+                                 :message => str)
     mes.add_button(Gtk::Stock::CANCEL, SEARCH_CANCEL)
     mes.add_button("最初から", SEARCH_FROM_TOP)
     mes.add_button("前月", SEARCH_PREV_MONTH)
