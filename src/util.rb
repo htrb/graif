@@ -604,8 +604,8 @@ class TimeInput < Gtk::Grid
     attach(label, 0, 0, 1, 1)
     attach(@hour, 1, 0, 1, 1)
     label = Gtk::Label.new(":")
-    label.set_margin_start(PAD)
-    label.set_margin_end(PAD)
+    label.set_margin_start(PAD / 2)
+    label.set_margin_end(PAD / 2)
     attach(label, 2, 0, 1, 1)
     attach(@min, 3, 0, 1, 1)
   end
