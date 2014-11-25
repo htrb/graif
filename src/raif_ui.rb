@@ -781,7 +781,7 @@ class Raif_ui < Gtk::Window
 
 
   def message(str, parent = self)
-    err_message(str, parent, Gtk::MessageDialog::INFO, "Information")
+    err_message(str, parent, Gtk::MessageType::INFO, "Information")
   end
 
   def err_message(str, parent = self, type = Gtk::MessageType::ERROR, titie = "Error")
@@ -1152,9 +1152,8 @@ class Raif_ui < Gtk::Window
                           :comments => "#{APP_NAME} は zaif とデータ互換の家計簿ソフトです",
                           :authors => APP_AUTHORS,
                           :website => WEBSITE,
+#                          :license_type => :gpl_3_0,
                           :logo => Icon,
-                          :wrap_license => false,
-                          :license_type => :gpl_3_0
                           )
   end
 end
