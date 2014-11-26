@@ -81,15 +81,16 @@ class GraphWindow < DialogWindow
                            y, start + 1,
                            (start == 0)? y: y + 1, (start == 0)? 12: start)
       if (@graph_type.active == 0)
-        @graph.set_title("#{y}年度支出")
+        @graph.title = "#{y}年度支出"
       else
-        @graph.set_title("#{y}年度収入")
+        @graph.title = "#{y}年度収入"
       end
-      @graph.set_legend(category)
+      @graph.legend = category
       get_data(y, start)
     end
-    @graph.draw(@data, @parent.start_of_year)
-    self.window.invalidate_rect(nil)
+    @graph.min_x = @parent.start_of_year
+    @graph.data = @data
+    @graph.window.invalidate_rect(nil)
   end
 
   def get_category_summary(category, summary)
@@ -266,7 +267,9 @@ class Graph < Gtk::DrawingArea
 
   LINE_ON_OFF_DASH = [4, 4]
   LINE_SOLID = []
-  
+
+  attr_accessor :min_x, :data, :title, :legend
+
   def initialize
     @gc = nil
 
@@ -308,19 +311,8 @@ class Graph < Gtk::DrawingArea
     }
   end
 
-  def init
-    @gc = nil
-  end
-
-  def set_title(t)
-    @title = t
-  end
-
-  def set_legend(legend)
-    @legend = legend
-  end
-
   def draw(data, start = nil)
+    return if (@gc.nil?)
     if (start)
       @min_x = start
       @max_x = @min_x + 11
@@ -332,7 +324,6 @@ class Graph < Gtk::DrawingArea
   end
 
   def redraw
-    init if (@gc.nil?)
     clear
     draw_frame
     @data.each_with_index {|d, i|

@@ -1,3 +1,9 @@
+2014-11-26  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/graph.rb (Graph): use attr_accessor.
+	(Graph#draw): check @gc.
+	(GraphWindow#create_btns): don't call Graph#draw.
+
 2014-11-20  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/util.rb (TimeInput#initialize): add second parameter.
