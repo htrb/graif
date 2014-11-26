@@ -163,9 +163,16 @@ class Raif_ui < Gtk::Window
     }
 
     @tree_view.signal_connect('button-press-event') {|w, e|
-      if (e.kind_of?(Gdk::EventButton) && e.button == 3)
+      return false unless (e.kind_of?(Gdk::EventButton))
+      case (e.button)
+      when 3
         @tree_view_menu.popup(nil, nil, 3, Gtk.current_event_time)
+      when 8
+        @calendar.back
+      when 9
+        @calendar.forward
       end
+      false
     }
 
     Plugin.init(self, @zaif_data, @calendar)

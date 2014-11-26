@@ -1,5 +1,7 @@
 2014-11-26  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
+	* src/raif_ui.rb (Raif_ui#initialize): support buttons 8 and 9.
+
 	* src/graph.rb (Graph): use attr_accessor.
 	(Graph#draw): check @gc.
 	(GraphWindow#create_btns): don't call Graph#draw.
