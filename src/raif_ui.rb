@@ -312,7 +312,7 @@ class Raif_ui < Gtk::Window
     [
      [
       "FileSaveAction",
-      _('_Save data'),
+      nil, #_('_Save data'),
       _('Save data'),
       proc{
         save(false)
@@ -321,42 +321,42 @@ class Raif_ui < Gtk::Window
      ],
      [
       "FileQuitAction",
-      _("_Quit"),
+      nil, #_("_Quit"),
       _("Quit program"),
       proc{close},
       Gtk::Stock::QUIT,
      ],
      [
       "EditCutAction",
-      _("_Cut"),
+      nil, #_("_Cut"),
       _("Cut"),
       proc{do_cut},
       Gtk::Stock::CUT,
      ],
      [
       "EditCopyAction",
-      _("_Copy"),
+      nil, #_("_Copy"),
       _("Copy"),
       proc{do_copy},
       Gtk::Stock::COPY,
      ],
      [
       "EditPasteAction",
-      _("_Paste"),
+      nil, #_("_Paste"),
       _("Paste"),
       proc{do_paste},
       Gtk::Stock::PASTE,
      ],
      [
       "EditDeleteAction",
-      _('_Delete'),
+      nil, #_('_Delete'),
       _('Delete selected'),
       proc{delete_item},
       Gtk::Stock::DELETE,
      ],
      [
       "EditSearchAction",
-      _("_Search"),
+      nil, #_("_Search"),
       _("Search"),
       proc{search_dialog},
       Gtk::Stock::FIND,
@@ -369,14 +369,14 @@ class Raif_ui < Gtk::Window
      ],
      [
       "SettingPreferenceAction",
-      _("_Preference"),
+      nil, #_("_Preference"),
       _("Preference"),
       proc{show_setup_win},
       Gtk::Stock::PREFERENCES,
      ],
      [
       "SettingBudgetAction",
-      _("予算入力(_B)..."),
+      _("予算入力(_B)"),
       '予算の設定を行ないます',
       proc{show_budget_win(@calendar.year, @calendar.month + 1)},
      ],
@@ -424,7 +424,7 @@ class Raif_ui < Gtk::Window
      ],
      [
       "ViewGotoAction",
-      _('移動(_T)...'),
+      _('移動(_T)'),
       '指定月に移動します',
       proc{show_goto_dialog(@calendar.year, @calendar.month + 1)},
       Gtk::Stock::JUMP_TO
@@ -480,24 +480,24 @@ class Raif_ui < Gtk::Window
      ],
      [
       "HelpAboutAction",
-      _("_About"),
+      nil, #_("_About"),
       _("About this software"),
       proc{create_about},
       Gtk::Stock::ABOUT,
      ],
      [
       "FileMenuAction",
-      _("_File"),
+      nil, #_("_File"),
       _("File"),
       nil,
-      nil,
+      Gtk::Stock::FILE,
      ],
      [
       "EditMenuAction",
-      _("_Edit"),
+      nil, #_("_Edit"),
       _("Edit"),
       nil,
-      nil,
+      Gtk::Stock::EDIT,
      ],
      [
       "ViewMenuAction",
@@ -515,10 +515,10 @@ class Raif_ui < Gtk::Window
      ],
      [
       "HelpMenuAction",
-      _("_Help"),
+      nil, #_("_Help"),
       _("Help"),
       nil,
-      nil,
+      Gtk::Stock::HELP,
      ],
      [
       "FilePluginMenuAction",
