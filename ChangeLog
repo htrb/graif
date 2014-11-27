@@ -1,3 +1,8 @@
+2014-11-27  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/raif_ui.rb (Raif_ui#define_action_item): use texts come from
+	stock items.
+
 2014-11-26  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/raif_ui.rb (Raif_ui#initialize): support buttons 8 and 9.
