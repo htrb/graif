@@ -1,5 +1,10 @@
 2014-11-27  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
+	* src/receipt_dialog.rb (ReceiptDialog#create_setting_panel):
+	change position of the @tax_label.
+
+	* src/graph.rb (GraphWindow#draw): add @drawing flag.
+
 	* src/raif_ui.rb (Raif_ui#define_action_item): use texts come from
 	stock items.
 

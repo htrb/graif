@@ -264,6 +264,9 @@ class ReceiptDialog < DialogWindow
     box.attach(label, 1, 0, 1, 1)
     box.attach(hbox, 2, 0, 1, 1)
 
+    @tax_label = MyLabel.new("")
+    box.attach(@tax_label, 3, 0, 1, 1)
+
     hbox = Gtk::Box.new(:horizontal, 0)
     @account = AccountComboBox.new
     add_margin(@account)
@@ -275,8 +278,6 @@ class ReceiptDialog < DialogWindow
     add_hmargin(@exceptional)
     add_margin(@exceptional)
     box.attach(@exceptional, 3, 1, 1, 1)
-    @tax_label = MyLabel.new("")
-    box.attach(@tax_label, 4, 1, 1, 1)
 
     hbox = Gtk::Box.new(:horizontal, 0)
     @total = Gtk::Entry.new
