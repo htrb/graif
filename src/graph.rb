@@ -3,6 +3,7 @@
 
 class GraphWindow < DialogWindow
   def initialize(parent, data)
+    @drawing = false
     super
     @graph = Graph.new
     set_size_request(600, 400)
@@ -60,6 +61,8 @@ class GraphWindow < DialogWindow
   end
 
   def draw(y, redraw = false)
+    return if (@drawing)
+    @drawing = true
     if ((@refresh_btn.visible? || redraw || @data.size < 1 || y != @year) &&
         @category.active_item)
       category = []
@@ -91,6 +94,7 @@ class GraphWindow < DialogWindow
     @graph.min_x = @parent.start_of_year
     @graph.data = @data
     @graph.window.invalidate_rect(nil)
+    @drawing = false
   end
 
   def get_category_summary(category, summary)
