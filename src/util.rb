@@ -91,20 +91,35 @@ class IntegerEntry < NumericEntry
 end
 
 class MonthYearComboBox < Gtk::ComboBoxText
+  MonthMode = 0
+  YearMode = 1
+
   def initialize
     super
     ["月", "年"].each {|i|
       append_text(i)
     }
-    self.active = 0
+    self.active = MonthMode
   end
 
   def month?
-    self.active == 0
+    self.active == MonthMode
   end
 
   def year?
-    self.active == 1
+    self.active == YearMode
+  end
+
+  def mode=(mode)
+    if (mode == YearMode)
+      self.active = YearMode
+    else
+      self.active = MonthMode
+    end
+  end
+
+  def mode
+    self.active
   end
 end
 
