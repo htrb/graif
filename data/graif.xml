@@ -18,11 +18,7 @@
       <menuitem name="EditSearchNext" action="EditSearchNextAction"/>
     </menu>
     <menu name="ViewMenu" action="ViewMenuAction">
-      <menuitem name="ViewShowAccountSummary" action="ViewShowAccountSummaryAction"/>
-      <menuitem name="ViewShowCategorySummary" action="ViewShowCategorySummaryAction"/>
-      <menuitem name="ViewShowAccountInOut" action="ViewShowAccountInOutAction"/>
-      <menuitem name="ViewShowItemSummary" action="ViewShowItemSummaryAction"/>
-      <menuitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
+      <menuitem name="ViewShowSummary" action="ViewShowSummaryAction"/>
       <menuitem name="ViewShowGraph" action="ViewShowGraphAction"/>
       <separator/>
       <menuitem name="ViewGoto" action="ViewGotoAction"/>
@@ -39,12 +35,7 @@
     <toolitem name="Save" action="FileSaveAction"/>
 
     <separator/>
-    <toolitem name="ViewShowAccountSummary" action="ViewShowAccountSummaryAction"/>
-    <toolitem name="ViewShowCategorySummary" action="ViewShowCategorySummaryAction"/>
-    <toolitem name="ViewShowAccountInOut" action="ViewShowAccountInOutAction"/>
-    <toolitem name="ViewShowItemSummary" action="ViewShowItemSummaryAction"/>
-    <toolitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
-    <toolitem name="ViewShowMonthSummery" action="ViewShowMonthSummeryAction"/>
+    <toolitem name="ViewShowSummary" action="ViewShowSummaryAction"/>
     <toolitem name="ViewShowGraph" action="ViewShowGraphAction"/>
     <separator/>
     <toolitem name="PrevMonth" action="ViewPrevMonthAction"/>

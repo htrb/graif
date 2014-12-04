@@ -22,7 +22,8 @@ class SetupWindow < DialogWindow
   }
 
   def initialize(parent, data)
-    super(parent, data)
+    super(parent)
+    @zaif_data = data
     self.modal = true
     self.transient_for = parent
 

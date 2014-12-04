@@ -17,7 +17,8 @@ class ReceiptDialog < DialogWindow
   COLUMN_CATEGORY_ID = COLUMN_DATA.size
 
   def initialize(parent, data, calendar)
-    super(parent, data)
+    super(parent)
+    @zaif_data = data
     self.modal = true
     self.transient_for = parent
     self.title = "Receipt"

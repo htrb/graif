@@ -1,3 +1,13 @@
+2014-12-04  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/util.rb (MonthYearComboBox): add constants MonthMode and YearMode.
+	(MonthYearComboBox#mode, MonthYearComboBox#mode): added.
+
+	* src/dialog.rb (SummaryDialog): added.
+	(SummaryWindow): now ingerit Gtk::Box.
+	(SummaryWindow): use @@year and @@month installed of @year and
+	@month.
+
 2014-11-27  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/receipt_dialog.rb (ReceiptDialog#create_setting_panel):

@@ -4,7 +4,8 @@
 class GraphWindow < DialogWindow
   def initialize(parent, data)
     @drawing = false
-    super
+    @zaif_data = data
+    super(parent)
     @graph = Graph.new
     set_size_request(600, 400)
     @year = Date.today.year
@@ -314,6 +315,8 @@ class Graph < Gtk::DrawingArea
       draw(@data) if (@data && @data.size > 0)
     }
   end
+
+  private
 
   def draw(data, start = nil)
     return if (@gc.nil?)

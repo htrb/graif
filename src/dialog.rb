@@ -4,10 +4,10 @@
 class DialogWindow < Gtk::Window
   attr_reader :geometry
 
-  def initialize(parent, data)
+  def initialize(parent)
     super(Gtk::Window::Type::TOPLEVEL)
     @parent = parent
-    @zaif_data = data
+    @show_all = true
     set_icon(Icon)
     begin
       @parent.add_group(self)
@@ -28,7 +28,11 @@ class DialogWindow < Gtk::Window
       return
     end 
     self.parse_geometry(@geometry) if (@geometry)
-    self.show_all
+    if (@show_all)
+      show_all
+      @show_all = false
+    end
+    super
   end
 
   def hide
@@ -47,23 +51,28 @@ class DialogWindow < Gtk::Window
   end
 end
 
-class SummaryWindow < DialogWindow
-  Label_this_year  = ' 今年 '
-  Label_this_month = ' 今月 '
-  def initialize(parent, data, has_year_btn = false, has_progress = false)
-    super(parent, data)
-    @vbox =Gtk::Box.new(:vertical, 0)
-    @year = nil
-    @month = nil
-    @updating = false
-    @title = ""
+class SummaryDialog < DialogWindow
+  def initialize(parent, data)
+    super(parent)
+    @stack = Gtk::Stack.new
+#    @stack.transition_type = :slide_right
+#    @stack.transition_duration = 1000
+    switcher = Gtk::StackSwitcher.new
+    switcher.stack = @stack
 
-    e = @parent.get_gconf("/general/#{self.class.to_s.gsub('Window','').downcase}_expand")
-    @expand = if (e)
-                e.split(',').collect {|p| Gtk::TreePath.new(p)}
-              else
-                []
-              end
+    @widgets = []
+    @visible = nil
+
+    append(AccountSummaryWindow.new(parent, self, data))
+    append(CategorySummaryWindow.new(parent, self, data))
+    append(AccountInOutWindow.new(parent, self, data))
+    append(MonthSummaryWindow.new(parent, self, data))
+    append(ItemSummaryWindow.new(parent, self, data))
+
+    vbox = Gtk::Box.new(:vertical, 0)
+    vbox.pack_start(switcher, :expand => false, :fill => false, :padding => 0)
+    vbox.pack_start(@stack)
+    add(vbox)
 
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
@@ -71,17 +80,32 @@ class SummaryWindow < DialogWindow
         hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
       end
     }
-
-    @vbox.pack_end(create_btns(has_year_btn, has_progress), :expand => false, :fill => false, :padding => 0)
-    add(@vbox)
   end
 
-  def set_title(title)
-    @title = title
+  def append(widget)
+    @widgets.push(widget)
+    title = widget.title
+    @stack.add(widget, title, title)
+  end
+
+  def show(y, m)
+    @widgets.each {|w|
+      w.year = y
+      w.month = m
+    }
+    @stack.set_visible_child(@visible) if (@visible)
+    super()
+  end
+
+  def hide
+    @visible = @stack.visible_child
+    super
   end
 
   def update(y, m)
-    show_data(@year, @month) if ((y < @year || (y == @year && m <= @month)) && self.visible?)
+    @widgets.each {|w|
+      w.update(y, m)
+    }
   end
 
   def show_toggle(y, m)
@@ -91,25 +115,80 @@ class SummaryWindow < DialogWindow
       show(y, m)
     end
   end
+end
+
+class SummaryWindow < Gtk::Box
+  Label_this_year  = ' 今年 '
+  Label_this_month = ' 今月 '
+
+  @@mode = MonthYearComboBox::MonthMode
+  @@year = nil
+  @@month = nil
+
+  attr_reader :title
+  attr_accessor :year, :month
+
+  def initialize(parent, window, data, has_year_btn = false, has_progress = false)
+    super(:vertical, 0)
+    @zaif_data = data
+    @vbox = self
+    @title = ""
+    @window = window
+
+    @parent = parent
+    e = @parent.get_gconf("/general/#{self.class.to_s.gsub('Window','').downcase}_expand")
+    @expand = if (e)
+                e.split(',').collect {|p| Gtk::TreePath.new(p)}
+              else
+                []
+              end
+
+    @updating = false
+
+    signal_connect('map') {|w|
+      if (@@month && @@year)
+        show_data(@@year, @@month)
+      else
+        show_today
+      end
+    }
+
+    pack_end(create_btns(has_year_btn, has_progress), :expand => false, :fill => false, :padding => 0)
+  end
+
+  def year=(y)
+    @@year = y
+  end
+
+  def month=(m)
+    @@month = m if (m > 0 && m < 13)
+  end
+
+  def set_title(title)
+    @title = title
+  end
+
+  def title=(title)
+    @window.title = title
+  end
+
+  def update(y, m)
+    show_data(@@year, @@month) if ((y < @@year || (y == @@year && m <= @@month)) && self.visible?)
+  end
 
   def show(y, m)
-    super()
     show_data(y, m)
   end
 
   def hide
-    return unless (self.visible?)
-    return if (@updating)
-    set_expand
-    @parent.set_gconf("/general/#{self.class.to_s.gsub('Window','').downcase}_expand",
-                      @expand.collect{|p| p.to_s}.join(','))
-    super
+    @window.hide
   end
 
   private
 
   def show_data(y, m)
     updating
+    @cb_year.mode = @@mode if (@cb_year)
     if (@cb_year && @cb_year.year?)
       y , m = get_start_of_year(y, m)
       self.title = sprintf('%s %04d年度 (%d/%02d-%d/%02d)',
@@ -127,14 +206,14 @@ class SummaryWindow < DialogWindow
     updating
     set_expand
     if (@cb_year && @cb_year.year?)
-      @year += 1
-    elsif (@month == 12)
-      @month = 1
-      @year += 1
+      @@year += 1
+    elsif (@@month == 12)
+      @@month = 1
+      @@year += 1
     else
-      @month += 1
+      @@month += 1
     end
-    show_data(@year, @month)
+    show_data(@@year, @@month)
   end
 
   def show_prev
@@ -142,14 +221,14 @@ class SummaryWindow < DialogWindow
     updating
     set_expand
     if (@cb_year && @cb_year.year?)
-      @year -= 1
-    elsif (@month == 1)
-      @month = 12
-      @year -= 1
+      @@year -= 1
+    elsif (@@month == 1)
+      @@month = 12
+      @@year -= 1
     else
-      @month -= 1
+      @@month -= 1
     end
-    show_data(@year, @month)
+    show_data(@@year, @@month)
   end
 
   def show_today
@@ -197,8 +276,9 @@ class SummaryWindow < DialogWindow
       @cb_year = MonthYearComboBox.new
       hb.pack_end(@cb_year, :expand => false, :fill => false, :padding => 0)
       @cb_year.signal_connect("changed") {|w|
-        set_expand
-        show_data(@year, @month)
+        @@mode = @cb_year.mode
+#        set_expand
+        show_data(@@year, @@month)
         if (@cb_year.year?)
           @today_btn.label = Label_this_year
         else
@@ -217,8 +297,8 @@ class SummaryWindow < DialogWindow
   end
 
   def expand
-    @expand.each {|p|
-      @tree_view.expand_to_path(p)
+    @expand.each {|path|
+      @tree_view.expand_to_path(path)
     }
   end
 
@@ -254,8 +334,8 @@ class AccountSummaryWindow < SummaryWindow
   }
 
 
-  def initialize(parent, data)
-    super(parent, data, true, true)
+  def initialize(parent, win, data)
+    super(parent, win, data, true, true)
     @tree_view = create_table(@vbox)
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
@@ -307,8 +387,8 @@ class AccountSummaryWindow < SummaryWindow
 
   def show_data(y, m)
     super
-    @year = y
-    @month = m
+    @@year = y
+    @@month = m
 
     if (@cb_year.year?)
       method = :get_account_summary_year
@@ -364,8 +444,8 @@ class CategorySummaryWindow < SummaryWindow
     data[COLUMN_DATA_ID] = i
   }
 
-  def initialize(parent, data)
-    super(parent, data, true, true)
+  def initialize(parent, win, data)
+    super(parent, win, data, true, true)
     @tree_view = create_table(@vbox)
     signal_connect('key-press-event') {|w, e|
       case (e.keyval)
@@ -465,8 +545,8 @@ class CategorySummaryWindow < SummaryWindow
     @tree_view.model = nil
     model.clear
 
-    @month = m
-    @year = y
+    @@month = m
+    @@year = y
     if (@cb_year.year?)
       y, m = get_start_of_year(y, m)
       summary = @zaif_data.get_category_summary_year(y, m) {|progress|
@@ -525,7 +605,7 @@ class BudgetWindow < SummaryWindow
 
   COLUMN_ID = COLUMN_DATA.size
 
-  def initialize(parent, data)
+  def initialize(parent, win, data)
     super
     self.modal = true
     self.transient_for = parent
@@ -616,7 +696,7 @@ class BudgetWindow < SummaryWindow
   end
 
   def save
-    month = @zaif_data.get_month_data(@year, @month)
+    month = @zaif_data.get_month_data(@@year, @@month)
     set_budget(@tree_view.model.iter_first.first_child, month)
     @modified = false
   end
@@ -706,8 +786,8 @@ class BudgetWindow < SummaryWindow
     }
     @tree_view.model = model
     expand
-    @year = y
-    @month = m
+    @@year = y
+    @@month = m
     updating_done
   end
 
@@ -748,8 +828,8 @@ class MonthSummaryWindow < SummaryWindow
   COLUMN_INDEX = COLUMN_DATA.size
   COLUMN_ITEM  = COLUMN_INDEX + 1
 
-  def initialize(parent, data)
-    super(parent, data, false, true)
+  def initialize(parent, win, data)
+    super(parent, win, data, false, true)
 
     @tree_view = create_table(@vbox)
 
@@ -771,13 +851,13 @@ class MonthSummaryWindow < SummaryWindow
   end
 
   def update(y, m)
-    show_data(@year, @month) if (y == @year && m == @month && self.visible?)
+    show_data(@@year, @@month) if (y == @@year && m == @@month && self.visible?)
   end
 
   def select_item
     itr = @tree_view.selection.selected
     if (itr)
-      @parent.goto(@year, @month, itr[COLUMN_DAY], itr[COLUMN_ITEM])
+      @parent.goto(@@year, @@month, itr[COLUMN_DAY], itr[COLUMN_ITEM])
       @parent.present
     end
   end
@@ -894,8 +974,8 @@ class MonthSummaryWindow < SummaryWindow
       end
       row[COLUMN_TYPE] = "(#{row[COLUMN_TYPE]})" if (i.exceptional)
     }
-    @year = y
-    @month = m
+    @@year = y
+    @@month = m
     @progress.show_progress(1) if (@parent.progress_bar?)
 #   ^ this code is needed to wait for tree_view will be shown.
     @progress.end_progress
@@ -924,8 +1004,8 @@ class AccountInOutWindow < SummaryWindow
   COLUMN_INDEX = COLUMN_DATA.size
   COLUMN_ITEM  = COLUMN_INDEX + 1
 
-  def initialize(parent, data)
-    super(parent, data, true, true)
+  def initialize(parent, win, data)
+    super(parent, win, data, true, true)
 
     @account = AccountComboBox.new
     @vbox.pack_start(@account, :expand => false, :fill => false, :padding => 0)
@@ -948,14 +1028,14 @@ class AccountInOutWindow < SummaryWindow
     }
 
     @account.signal_connect("changed"){|w|
-      show_data(@year, @month)
+      show_data(@@year, @@month)
     }
 
     set_title(_('口座出入金一覧'))
   end
 
   def update(y, m)
-    show_data(@year, @month) if (self.visible? && (y < @year || (y == @year && m <= @month)))
+    show_data(@@year, @@month) if (self.visible? && (y < @@year || (y == @@year && m <= @@month)))
   end
 
   def select_item
@@ -1020,8 +1100,8 @@ class AccountInOutWindow < SummaryWindow
     @tree_view.model = nil
     model.clear
 
-    @year = y
-    @month = m
+    @@year = y
+    @@month = m
 
     if (@cb_year.year?)
       y, m = get_start_of_year(y, m)
@@ -1144,8 +1224,8 @@ class ItemSummaryWindow < SummaryWindow
 
   COLUMN_ITEM = COLUMN_DATA.size
 
-  def initialize(parent, data)
-    super(parent, data, true, true)
+  def initialize(parent, win, data)
+    super(parent, win, data, true, true)
 
     @tree_view = create_table(@vbox)
 
@@ -1181,7 +1261,7 @@ class ItemSummaryWindow < SummaryWindow
     @search_btn.set_margin_top(PAD)
     @search_btn.set_margin_bottom(PAD)
     @search_btn.signal_connect('clicked') {|w, e|
-      show_data(@year, @month)
+      show_data(@@year, @@month)
     }
 
     @search_item.widget.attach(@search_btn, 2, 0, 1, 3)
@@ -1247,8 +1327,8 @@ class ItemSummaryWindow < SummaryWindow
   end
 
   def show(y, m)
-    @year = y
-    @month = m
+    @@year = y
+    @@month = m
     show_all
     @progress.end_progress
   end
@@ -1315,7 +1395,7 @@ class ItemSummaryWindow < SummaryWindow
       return
     end
 
-    @year = y
+    @@year = y
 
     model = @tree_view.model
     return unless (model)

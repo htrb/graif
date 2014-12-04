@@ -50,11 +50,7 @@ class Raif_ui < Gtk::Window
     @app_conf = GraifConfig.new(CONFIG_FILE)
     @setup_win = nil
     @zaif_data = nil
-    @account_summary = nil
-    @category_summary = nil
-    @month_summary = nil
-    @item_summary = nil
-    @account_in_out = nil
+    @summary = nil
     @budget_win = nil
     @search_dialog = nil
     @receipt_dialog = nil
@@ -381,39 +377,11 @@ class Raif_ui < Gtk::Window
       proc{show_budget_win(@calendar.year, @calendar.month + 1)},
      ],
      [
-      "ViewShowAccountSummaryAction",
-      _('口座集計(_A)'),
-      _('口座集計を表示します'),
-      proc{show_account_summary(@calendar.year, @calendar.month + 1)},
+      "ViewShowSummaryAction",
+      _('集計(_S)'),
+      _('集計を表示します'),
+      proc{show_summary(@calendar.year, @calendar.month + 1)},
       BOOK_BLUE
-     ],
-     [
-      "ViewShowCategorySummaryAction",
-      _('分類集計(_C)'),
-      _('分類集計を表示します'),
-      proc{show_category_summary(@calendar.year, @calendar.month + 1)},
-      BOOK_RED
-     ],
-     [
-      "ViewShowAccountInOutAction",
-      _('口座出入金集計(_O)'),
-      '口座出入金集計を表示します',
-      proc{show_account_in_out(@calendar.year, @calendar.month + 1)},
-      BOOK_YELLOW
-     ],
-     [
-      "ViewShowItemSummaryAction",
-      _('項目集計(_I)'),
-      '検索項目集計を表示します',
-      proc{show_item_summary(@calendar.year, @calendar.month + 1)},
-      BOOK_GREEN
-     ],
-     [
-      "ViewShowMonthSummeryAction",
-      _('月データ一覧(_S)'),
-      '月のデータ一覧を表示します',
-      proc{show_month_summary(@calendar.year, @calendar.month + 1)},
-      BOOK_OPEN
      ],
      [
       "ViewShowGraphAction",
@@ -680,11 +648,7 @@ class Raif_ui < Gtk::Window
     if (! conf_quit || conf_message(_('プログラムを終了しますか？'), self, false))
       Memo_entry.save_history(HIST_FILE, history_size)
       set_gconf('/process/pid', 0)
-      @account_summary.hide if (@account_summary)
-      @category_summary.hide if (@category_summary)
-      @month_summary.hide if (@month_summary)
-      @item_summary.hide if (@item_summary)
-      @account_in_out.hide if (@account_in_out)
+      @summary.hide if (@summary)
       save_win_size
       @app_conf.save
       Gtk::main_quit
@@ -775,10 +739,7 @@ class Raif_ui < Gtk::Window
   end
 
   def update_summary_windows(y, m)
-    @account_summary.update(y, m) if (@account_summary)
-    @category_summary.update(y, m) if (@category_summary)
-    @month_summary.update(y, m) if (@month_summary)
-    @account_in_out.update(y, m) if (@account_in_out)
+    @summary.update(y, m) if (@summary)
     @graph.update(y) if (@graph)
   end
 
@@ -821,74 +782,14 @@ class Raif_ui < Gtk::Window
 
   private
 
-  def show_account_summary(y, m)
-    @account_summary =
-      AccountSummaryWindow.new(self, @zaif_data) if (@account_summary.nil?)
-    @account_summary.show(y, m)
-  end
-
-  def show_category_summary(y, m)
-    @category_summary =
-      CategorySummaryWindow.new(self, @zaif_data) if (@category_summary.nil?)
-    @category_summary.show(y, m)
-  end
-
-  def show_account_in_out(y, m)
-    @account_in_out =
-      AccountInOutWindow.new(self, @zaif_data) if (@account_in_out.nil?)
-    @account_in_out.show(y, m)
-  end
-
-  def show_month_summary(y, m)
-    @month_summary =
-      MonthSummaryWindow.new(self, @zaif_data) if (@month_summary.nil?)
-    @month_summary.show(y, m)
-  end
-
-  def show_item_summary(y, m)
-    @item_summary =
-      ItemSummaryWindow.new(self, @zaif_data) unless (@item_summary)
-    @item_summary.show(y, m)
+  def show_summary(y, m)
+    @summary = SummaryDialog.new(self, @zaif_data) if (@summary.nil?)
+    @summary.show(y, m)
   end
 
   def show_graph(y, m)
     @graph = GraphWindow.new(self, @zaif_data) if (@graph.nil?)
     @graph.show(y, m)
-  end
-
-  def show_toggle_account_summary(y, m)
-    @account_summary =
-      AccountSummaryWindow.new(self, @zaif_data) if (@account_summary.nil?)
-    @account_summary.show_toggle(y, m)
-  end
-
-  def show_toggle_category_summary(y, m)
-    @category_summary =
-      CategorySummaryWindow.new(self, @zaif_data) if (@category_summary.nil?)
-    @category_summary.show_toggle(y, m)
-  end
-
-  def show_toggle_account_in_out(y, m)
-    @account_in_out =
-      AccountInOutWindow.new(self, @zaif_data) if (@account_in_out.nil?)
-    @account_in_out.show_toggle(y, m)
-  end
-
-  def show_toggle_month_summary(y, m)
-    @month_summary =
-      MonthSummaryWindow.new(self, @zaif_data) unless (@month_summary)
-    @month_summary.show_toggle(y, m)
-  end
-
-  def show_toggle_item_summary(y, m)
-    @item_summary =
-      ItemSummaryWindow.new(self, @zaif_data) unless (@item_summary)
-    @item_summary.show_toggle(y, m)
-  end
-
-  def show_toggle_graph(y, m)
-    @graph = GraphWindow.new(self, @zaif_data) if (@graph.nil?)
-    @graph.show_toggle(y, m)
   end
 
   def show_budget_win(y, m)
