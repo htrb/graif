@@ -1,5 +1,7 @@
 2014-12-08  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
+	* src/dialog.rb (BudgetWindow#initialize): call SummaryWindow#set_title.
+
 	* src/graph.rb (GraphWindow): inherit SummaryWindow.
 
 	* src/dialog.rb (SummaryWindow#updating): set sensitivity of the parent window.

@@ -589,7 +589,6 @@ class BudgetDialog < DialogWindow
 
     self.modal = true
     self.transient_for = parent
-    set_title(_('予算入力'))
   end
 
   def show(y, m)
@@ -624,6 +623,7 @@ class BudgetWindow < SummaryWindow
 
     @tree_view = create_table(@vbox)
     @modified = false
+    set_title(_('予算入力'))
   end
 
   def set_sum
