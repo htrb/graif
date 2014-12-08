@@ -1,3 +1,10 @@
+2014-12-08  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/graph.rb (GraphWindow): inherit SummaryWindow.
+
+	* src/dialog.rb (SummaryWindow#updating): set sensitivity of the parent window.
+	(BudgetDialog): added.
+
 2014-12-04  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/util.rb (MonthYearComboBox): add constants MonthMode and YearMode.

@@ -19,7 +19,6 @@
     </menu>
     <menu name="ViewMenu" action="ViewMenuAction">
       <menuitem name="ViewShowSummary" action="ViewShowSummaryAction"/>
-      <menuitem name="ViewShowGraph" action="ViewShowGraphAction"/>
       <separator/>
       <menuitem name="ViewGoto" action="ViewGotoAction"/>
     </menu>
@@ -36,7 +35,6 @@
 
     <separator/>
     <toolitem name="ViewShowSummary" action="ViewShowSummaryAction"/>
-    <toolitem name="ViewShowGraph" action="ViewShowGraphAction"/>
     <separator/>
     <toolitem name="PrevMonth" action="ViewPrevMonthAction"/>
     <toolitem name="PrevDay" action="ViewPrevDayAction"/>

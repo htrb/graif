@@ -68,6 +68,7 @@ class SummaryDialog < DialogWindow
     append(AccountInOutWindow.new(parent, self, data))
     append(MonthSummaryWindow.new(parent, self, data))
     append(ItemSummaryWindow.new(parent, self, data))
+    append(GraphWindow.new(parent, self, data))
 
     vbox = Gtk::Box.new(:vertical, 0)
     vbox.pack_start(switcher, :expand => false, :fill => false, :padding => 0)
@@ -107,14 +108,6 @@ class SummaryDialog < DialogWindow
       w.update(y, m)
     }
   end
-
-  def show_toggle(y, m)
-    if (self.visible?)
-      hide
-    else
-      show(y, m)
-    end
-  end
 end
 
 class SummaryWindow < Gtk::Box
@@ -134,6 +127,7 @@ class SummaryWindow < Gtk::Box
     @vbox = self
     @title = ""
     @window = window
+    @button_box = nil
 
     @parent = parent
     e = @parent.get_gconf("/general/#{self.class.to_s.gsub('Window','').downcase}_expand")
@@ -181,6 +175,7 @@ class SummaryWindow < Gtk::Box
   end
 
   def hide
+    set_expand
     @window.hide
   end
 
@@ -241,13 +236,7 @@ class SummaryWindow < Gtk::Box
 
   def updating(state = true)
     @updating = state
-    [@prev_btn,
-     @today_btn,
-     @next_btn,
-     @close_btn,
-     @cb_year].each {|w|
-      w.sensitive = ! state if (w)
-    }
+    @window.sensitive = ! state
   end
 
   def updating_done
@@ -290,19 +279,22 @@ class SummaryWindow < Gtk::Box
 
     if (has_progress)
       @progress = MyProgressBar.new
-      hbox.pack_start(@progress, :expand => true, :fill => true, :padding => 10)
+      hbox.pack_end(@progress, :expand => true, :fill => true, :padding => 10)
     end
 
+    @button_box = hbox
     hbox
   end
 
   def expand
+    return unless (@tree_view)
     @expand.each {|path|
       @tree_view.expand_to_path(path)
     }
   end
 
   def set_expand
+    return unless (@tree_view)
     @expand.clear
     @tree_view.model.each{|model, path, iter|
       @expand.push(path) if (@tree_view.row_expanded?(path))
@@ -589,6 +581,28 @@ class CategorySummaryWindow < SummaryWindow
   end
 end
 
+class BudgetDialog < DialogWindow
+  def initialize(parent, data)
+    super(parent)
+    @budget = BudgetWindow.new(parent, self, data)
+    add(@budget)
+
+    self.modal = true
+    self.transient_for = parent
+    set_title(_('予算入力'))
+  end
+
+  def show(y, m)
+    @budget.show(y, m)
+    super()
+  end
+
+  def hide
+    @budget.save
+    super
+  end
+end
+
 class BudgetWindow < SummaryWindow
   COLUMN_DATA = [
                  [_('分類'),     :COLUMN_CATEGORY,     String,    false],
@@ -606,13 +620,10 @@ class BudgetWindow < SummaryWindow
   COLUMN_ID = COLUMN_DATA.size
 
   def initialize(parent, win, data)
-    super
-    self.modal = true
-    self.transient_for = parent
+    super(parent, win, data, false, false)
 
     @tree_view = create_table(@vbox)
     @modified = false
-    set_title(_('予算入力'))
   end
 
   def set_sum
@@ -696,14 +707,10 @@ class BudgetWindow < SummaryWindow
   end
 
   def save
+    return unless (@modified)
     month = @zaif_data.get_month_data(@@year, @@month)
     set_budget(@tree_view.model.iter_first.first_child, month)
     @modified = false
-  end
-
-  def hide
-    save if (@modified)
-    super
   end
 
   private
@@ -1316,14 +1323,7 @@ class ItemSummaryWindow < SummaryWindow
   end
 
   def update(y, m)
-  end
-
-  def show_toggle(y, m)
-    if (self.visible?)
-      hide
-    else
-      show(y, m)
-    end
+    @search_item.update
   end
 
   def show(y, m)

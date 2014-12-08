@@ -54,7 +54,6 @@ class Raif_ui < Gtk::Window
     @budget_win = nil
     @search_dialog = nil
     @receipt_dialog = nil
-    @graph = nil
 
     @clipboard = Gtk::Clipboard.get('PRIMARY')
 
@@ -381,14 +380,7 @@ class Raif_ui < Gtk::Window
       _('集計(_S)'),
       _('集計を表示します'),
       proc{show_summary(@calendar.year, @calendar.month + 1)},
-      BOOK_BLUE
-     ],
-     [
-      "ViewShowGraphAction",
-      _('分類グラフ(_G)'),
-      '分類のグラフを表示します',
-      proc{show_graph(@calendar.year, @calendar.month + 1)},
-      BAR_GRAPH
+      BOOK_OPEN
      ],
      [
       "ViewGotoAction",
@@ -740,7 +732,6 @@ class Raif_ui < Gtk::Window
 
   def update_summary_windows(y, m)
     @summary.update(y, m) if (@summary)
-    @graph.update(y) if (@graph)
   end
 
   def updated
@@ -787,14 +778,9 @@ class Raif_ui < Gtk::Window
     @summary.show(y, m)
   end
 
-  def show_graph(y, m)
-    @graph = GraphWindow.new(self, @zaif_data) if (@graph.nil?)
-    @graph.show(y, m)
-  end
-
   def show_budget_win(y, m)
     if (@budget_win.nil?)
-      @budget_win = BudgetWindow.new(self, @zaif_data)
+      @budget_win = BudgetDialog.new(self, @zaif_data)
       @budget_win.signal_connect('hide') {|w|
         set_action_sensitive("FileSaveAction", true) if (@zaif_data.modified)
       }
@@ -814,7 +800,6 @@ class Raif_ui < Gtk::Window
           @search_dialog.update if (@search_dialog)
           @receipt_dialog.update if (@receipt_dialog)
           @calendar.select_day(@calendar.day)
-          @graph.update if (@graph)
           Plugin.update
           set_action_sensitive("FileSaveAction", true)
           update_summary_windows(@calendar.year, @calendar.month + 1)

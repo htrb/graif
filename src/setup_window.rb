@@ -80,8 +80,7 @@ class SetupWindow < DialogWindow
       category_set_item(@category_tree.model.iter_first, @zaif_data.get_root_category) if (@category_tree.model.iter_first)
 
       @account_tree.model.each {|m, p, itr|
-        @zaif_data.add_account(itr[3].to_i + Zaif_config::ID_OFFSET,
-                               itr[0], itr[1].to_i, itr[2])
+        @zaif_data.add_account(itr[2].to_i + Zaif_config::ID_OFFSET, itr[0], itr[1])
       }
       @prev_modified = true
     end

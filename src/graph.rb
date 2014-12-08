@@ -1,26 +1,33 @@
 # -*- coding: utf-8 -*-
 # $Id: graph.rb,v 1.56 2011/09/25 12:57:52 hito Exp $
 
-class GraphWindow < DialogWindow
-  def initialize(parent, data)
+class GraphWindow < SummaryWindow
+  class DummyCombo
+    def year?
+      true
+    end
+
+    def mode=(m)
+    end
+  end
+
+  def initialize(parent, win, data)
     @drawing = false
     @zaif_data = data
-    super(parent)
+    @window = win
+    @parent = parent
+    super(parent, win, data, false, true)
     @graph = Graph.new
     set_size_request(600, 400)
     @year = Date.today.year
     @data = []
 
+    @cb_year = DummyCombo.new
+    @today_btn.label = Label_this_year
+
     @category_expense = CategoryComboBox.new(Zaif_category::EXPENSE, true)
     @category_expense.signal_connect("changed"){|w|
       draw(@year, true)
-    }
-
-    signal_connect('key-press-event') {|w, e|
-      case (e.keyval)
-      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
-        hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
-      end
     }
 
     @category_income = CategoryComboBox.new(Zaif_category::INCOME, true)
@@ -28,30 +35,21 @@ class GraphWindow < DialogWindow
       draw(@year, true)
     }
 
-    signal_connect('key-press-event') {|w, e|
-      case (e.keyval)
-      when Gdk::Keyval::KEY_W, Gdk::Keyval::KEY_w
-        hide if ((e.state & Gdk::ModifierType::CONTROL_MASK).to_i != 0)
-      end
+    pack_start(@category_expense, :expand => false, :fill => false, :padding => 0)
+    pack_start(@category_income, :expand => false, :fill => false, :padding => 0)
+    pack_start(@graph, :expand => true, :fill => true, :padding => 0)
+    create_additional_btns
+
+    signal_connect('map') {|w|
+      show_data(@@year, @@month)
     }
 
-    vbox = Gtk::Box.new(:vertical, 0)
-    vbox.pack_start(@category_expense, :expand => false, :fill => false, :padding => 0)
-    vbox.pack_start(@category_income, :expand => false, :fill => false, :padding => 0)
-    vbox.pack_start(@graph, :expand => true, :fill => true, :padding => 0)
-    vbox.pack_start(create_btns, :expand => false, :fill => false, :padding => 0)
-
     @category = @category_expense
-    self.add(vbox)
+    set_title("グラフ")
   end
 
-  def refresh
-    draw(@year, true)
-  end
-
-  def show(y, m)
-    super()
-    @month = m
+  def show_data(y, m)
+    super
     
     if (@category_expense == @category)
       @category_income.visible = false
@@ -59,13 +57,18 @@ class GraphWindow < DialogWindow
       @category_expense.visible = false
     end
     draw(y)
+    updating_done
   end
 
   def draw(y, redraw = false)
     return if (@drawing)
     @drawing = true
-    if ((@refresh_btn.visible? || redraw || @data.size < 1 || y != @year) &&
-        @category.active_item)
+    y, start = @parent.get_start_of_year(y, @@month)
+    @window.title = sprintf('%04d年度 (%d/%02d-%d/%02d)',
+                            y,
+                            y, start + 1,
+                            (start == 0)? y: y + 1, (start == 0)? 12: start)
+    if ((redraw || @data.size < 1 || y != @year) && @category.active_item)
       category = []
       @category.active_item.each_child {|c|
         if (@graph_type.active == 0)
@@ -79,11 +82,6 @@ class GraphWindow < DialogWindow
         category.push(@category.active_item.to_s)
       end
       @year = y
-      y, start = @parent.get_start_of_year(y, @month)
-      self.title = sprintf('%04d年度 (%d/%02d-%d/%02d)',
-                           y,
-                           y, start + 1,
-                           (start == 0)? y: y + 1, (start == 0)? 12: start)
       if (@graph_type.active == 0)
         @graph.title = "#{y}年度支出"
       else
@@ -110,18 +108,15 @@ class GraphWindow < DialogWindow
     [esum, isum]
   end
 
-  def update(y = @year)
+  def update(y, m)
     @category.update(false, true)
-    if (y == @year)
-      @refresh_btn.visible = true
-    end
+    super
   end
 
   def get_data(y = @year, start = 0)
     include_income = (@parent.get_gconf_bool('/general/graph_include_income'))
     include_expense = (@parent.get_gconf_bool('/general/graph_include_expense'))
 
-    @refresh_btn.visible = false
     @data.clear
     item = @category.active_item
     id = item.to_i
@@ -171,44 +166,7 @@ class GraphWindow < DialogWindow
     @progress.end_progress
   end
 
-  def show_toggle(y, m)
-    if (self.visible?)
-      hide
-    else
-      show(y, m)
-    end
-  end
-
-  def show_prev
-    draw(@year - 1)
-  end
-
-  def show_next
-    draw(@year + 1)
-  end
-
-  def show_today
-    draw(Date.today.year)
-  end
-
-  def create_btns
-    hbox = Gtk::Box.new(:horizontal, 0)
-
-    [
-      [Gtk::Stock::GO_BACK,    nil, :show_prev,  :pack_start],
-      [nil,            _(' 今年 '), :show_today, :pack_start],
-      [Gtk::Stock::GO_FORWARD, nil, :show_next,  :pack_start],
-      [Gtk::Stock::CLOSE,      nil, :hide,       :pack_end],
-      [Gtk::Stock::REFRESH,    nil, :refresh,    :pack_end],
-    ].each {|(title, label, method, pack)|
-      btn = Gtk::Button.new(:label => label, :mnemonic => nil, :stock_id => title)
-      btn.signal_connect('clicked') {|w|
-        send(method)
-      }
-      hbox.send(pack, btn, :expand => false, :fill => false, :padding => 0)
-      @refresh_btn = btn if (method == :refresh)
-    }
-
+  def create_additional_btns
     @graph_type = Gtk::ComboBoxText.new
     ["支出", "収入"].each {|i|
       @graph_type.append_text(i)
@@ -227,19 +185,19 @@ class GraphWindow < DialogWindow
       end
       draw(@year, true)
     }
-    hbox.pack_start(@graph_type, :expand => false, :fill => false, :padding => 10)
+    @button_box.pack_start(@graph_type, :expand => false, :fill => false, :padding => 10)
 
     @exceptional = Gtk::CheckButton.new("含特別")
     @exceptional.signal_connect("clicked"){|w|
       draw(@year, true)
     }
-    hbox.pack_start(@exceptional, :expand => false, :fill => false, :padding => 0)
-    @progress = MyProgressBar.new
-    hbox.pack_start(@progress, :expand => true, :fill => true, :padding => 10)
-    hbox
+    @button_box.pack_start(@exceptional, :expand => false, :fill => false, :padding => 0)
+  end
+
+  def hide
+    @window.hide
   end
 end
-
 
 class Graph < Gtk::DrawingArea
   COLOR_UNIT = 256

@@ -75,6 +75,11 @@ class SearchWidget
       @memo.text
     end
   end
+
+  def update
+    @account.update
+    @category.update
+  end
 end
 
 class SearchDialog < Gtk::Dialog
