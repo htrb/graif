@@ -1038,6 +1038,12 @@ class AccountInOutWindow < SummaryWindow
       show_data(@@year, @@month)
     }
 
+    @summary_panel = MyLabel.new("")
+    frame = Gtk::Frame.new
+    @summary_panel.set_alignment(0, 0.5)
+    frame.add(@summary_panel)
+    @vbox.pack_start(frame, :expand => false, :fill => false, :padding => 0)
+
     set_title(_('口座出入金一覧'))
   end
 
@@ -1100,6 +1106,7 @@ class AccountInOutWindow < SummaryWindow
 
   def show_data(y, m)
     super
+    @summary_panel.label = ""
     account = @account.active
 #    vadj = @tree_view.vadjustment.value
     model = @tree_view.model
@@ -1120,6 +1127,9 @@ class AccountInOutWindow < SummaryWindow
 
     @tree_view.get_column(COLUMN_MONTH).visible = @cb_year.year?
 
+    income = 0
+    expense = 0
+    move = 0
     month = @zaif_data.get_month_data(y, m)
     n.times {|j|
       size = month.size + 1.0
@@ -1152,12 +1162,14 @@ class AccountInOutWindow < SummaryWindow
           row[COLUMN_EXPENSE] = i.amount
           rest -= i.amount
           row[COLUMN_REST] = rest
+          expense += i.amount
         when Zaif_item::TYPE_INCOME
           row[COLUMN_CATEGORY] =
             @zaif_data.get_category_by_id(i.category, false, true).to_s
           row[COLUMN_INCOME] = i.amount
           rest += i.amount
           row[COLUMN_REST] = rest
+          income += i.amount
         when Zaif_item::TYPE_MOVE
           amount = i.amount
           fee = 0
@@ -1168,6 +1180,7 @@ class AccountInOutWindow < SummaryWindow
             row[COLUMN_EXPENSE] = amount
             row[COLUMN_CATEGORY] = @zaif_data.get_account_by_id(i.account_to).to_s
             rest -= amount
+            move -= amount
           else
             unless (i.fee_sign < 0)
               fee = i.fee
@@ -1175,6 +1188,7 @@ class AccountInOutWindow < SummaryWindow
             row[COLUMN_INCOME] = amount
             row[COLUMN_CATEGORY] = @zaif_data.get_account_by_id(i.account).to_s
             rest += amount
+            move += amount
           end
           row[COLUMN_REST] = rest
 
@@ -1192,8 +1206,10 @@ class AccountInOutWindow < SummaryWindow
             row[COLUMN_ITEM] = i
             if (rest < 0)
               row[COLUMN_EXPENSE] = -fee
+              expense -= fee
             else
               row[COLUMN_INCOME] = fee
+              income += fee
             end
           end
 
@@ -1209,6 +1225,9 @@ class AccountInOutWindow < SummaryWindow
     @progress.end_progress
 #    @tree_view.vadjustment.set_value(vadj)
     @tree_view.model = model
+
+    @summary_panel.label = "収入 : #{Commalize(income)}   支出 : #{Commalize(expense)}   移動 : #{Commalize(move)}   収支 : #{Commalize(income - expense + move)}"
+
     updating_done
   end
 end

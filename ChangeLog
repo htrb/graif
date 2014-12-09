@@ -1,3 +1,8 @@
+2014-12-09  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/dialog.rb (AccountInOutWindow#initialize): add summary panel.
+	(AccountInOutWindow#show_data): show summary.
+
 2014-12-08  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/dialog.rb (BudgetWindow#initialize): call SummaryWindow#set_title.
