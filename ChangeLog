@@ -2,6 +2,7 @@
 
 	* src/dialog.rb (AccountInOutWindow#initialize): add summary panel.
 	(AccountInOutWindow#show_data): show summary.
+	(ItemSummaryWindow#show_data): call MyProgressBar#end_progress.
 
 2014-12-08  Hiroyuki Ito  <ZXB01226 at nifty.com>
 

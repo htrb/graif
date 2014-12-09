@@ -1362,18 +1362,6 @@ class ItemSummaryWindow < SummaryWindow
     end
   end
 
-  def updating(state = true)
-    super
-    @updating = state
-    [@search_btn].each {|w|
-      w.sensitive = ! state if (w)
-    }
-  end
-
-  def updating_done
-    updating(false)
-  end
-
   def add_item(model, y, m, d, i)
     return 0 if (i.type ==  Zaif_item::TYPE_MOVE ||
                  i.type ==  Zaif_item::TYPE_ADJUST)
@@ -1402,6 +1390,7 @@ class ItemSummaryWindow < SummaryWindow
   end
 
   def show_data(y, m)
+    @progress.end_progress
     super
     @summary_panel.label = ""
     @tree_view.model.clear
