@@ -19,7 +19,6 @@
     </menu>
     <menu name="ViewMenu" action="ViewMenuAction">
       <menuitem name="ViewShowSummary" action="ViewShowSummaryAction"/>
-      <separator/>
       <menuitem name="ViewGoto" action="ViewGotoAction"/>
     </menu>
     <menu name="SettingMenu" action="SettingMenuAction">
