@@ -2,6 +2,11 @@
 # $Id: graph.rb,v 1.56 2011/09/25 12:57:52 hito Exp $
 
 class GraphWindow < SummaryWindow
+  YEAR_NUM = 10
+
+  YEAR_MODE = 0
+  MONTH_MODE = 1
+
   class DummyCombo
     def year?
       true
@@ -12,6 +17,7 @@ class GraphWindow < SummaryWindow
   end
 
   def initialize(parent, win, data)
+    @mode = MONTH_MODE
     @drawing = false
     @zaif_data = data
     @window = win
@@ -41,7 +47,8 @@ class GraphWindow < SummaryWindow
     create_additional_btns
 
     signal_connect('map') {|w|
-      show_data(@@year, @@month)
+      y = (@mode == YEAR_MODE) ? @year : @@year
+      show_data(y, @@month)
     }
 
     @category = @category_expense
@@ -50,7 +57,7 @@ class GraphWindow < SummaryWindow
 
   def show_data(y, m)
     super
-    
+
     if (@category_expense == @category)
       @category_income.visible = false
     else
@@ -64,10 +71,14 @@ class GraphWindow < SummaryWindow
     return if (@drawing)
     @drawing = true
     y, start = @parent.get_start_of_year(y, @@month)
-    @window.title = sprintf('%04d年度 (%d/%02d-%d/%02d)',
-                            y,
-                            y, start + 1,
-                            (start == 0)? y: y + 1, (start == 0)? 12: start)
+    if (@mode == YEAR_MODE)
+      @window.title = sprintf('%04d-%04d', y - YEAR_NUM + 1, y)
+    else
+      @window.title = sprintf('%04d年度 (%d/%02d-%d/%02d)',
+                              y,
+                              y, start + 1,
+                              (start == 0)? y: y + 1, (start == 0)? 12: start)
+    end
     if ((redraw || @data.size < 1 || y != @year) && @category.active_item)
       category = []
       @category.active_item.each_child {|c|
@@ -82,15 +93,27 @@ class GraphWindow < SummaryWindow
         category.push(@category.active_item.to_s)
       end
       @year = y
-      if (@graph_type.active == 0)
-        @graph.title = "#{y}年度支出"
+      if (@mode == YEAR_MODE)
+        if (@graph_type.active == 0)
+          @graph.title = "年度支出"
+        else
+          @graph.title = "年度収入"
+        end
       else
-        @graph.title = "#{y}年度収入"
+        if (@graph_type.active == 0)
+          @graph.title = "#{y}年度支出"
+        else
+          @graph.title = "#{y}年度収入"
+        end
       end
       @graph.legend = category
       get_data(y, start)
     end
-    @graph.min_x = @parent.start_of_year
+    if (@mode == YEAR_MODE)
+      @graph.min_x = @year - YEAR_NUM + 1
+    else
+      @graph.min_x = @parent.start_of_year
+    end
     @graph.data = @data
     @graph.window.invalidate_rect(nil)
     @drawing = false
@@ -113,18 +136,12 @@ class GraphWindow < SummaryWindow
     super
   end
 
-  def get_data(y = @year, start = 0)
-    include_income = (@parent.get_gconf_bool('/general/graph_include_income'))
-    include_expense = (@parent.get_gconf_bool('/general/graph_include_expense'))
-
-    @data.clear
-    item = @category.active_item
-    id = item.to_i
-
-    (1..12).each {|m|
-      @progress.show_progress((m -1) / 12.0) if (@parent.progress_bar?)
-      @data[m - 1] = []
-      summary = @zaif_data.get_category_summary(y, m + start, @exceptional.active?)
+  def get_month_data(y, start, item, id, include_income, include_expense, ofst = 0, div = 1)
+    data = []
+    12.times {|m|
+      @progress.show_progress(m / 12.0 / div + ofst) if (@parent.progress_bar?)
+      data[m] = []
+      summary = @zaif_data.get_category_summary(y, m + 1 + start, @exceptional.active?)
       next unless (item)
       item.each_child {|c|
         if (@graph_type.active == 0)
@@ -135,34 +152,69 @@ class GraphWindow < SummaryWindow
         e, i = get_category_summary(c, summary)
         if (@graph_type.active == 0)
           if (include_income)
-            @data[m - 1].push(e - i)
+            data[m].push(e - i)
           else
-            @data[m - 1].push(e)
+            data[m].push(e)
           end
         else
           if (include_expense)
-            @data[m - 1].push(i - e)
+            data[m].push(i - e)
           else
-            @data[m - 1].push(i)
+            data[m].push(i)
           end
         end
       }
-      if (id != 0)
+      if (summary[id])
         if (@graph_type.active == 0)
           if (include_income)
-            @data[m - 1].push(summary[id][0].to_i - summary[id][1].to_i)
+            data[m].push(summary[id][0].to_i - summary[id][1].to_i)
           else
-            @data[m - 1].push(summary[id][0].to_i)
+            data[m].push(summary[id][0].to_i)
           end
         else
           if (include_expense)
-            @data[m - 1].push(summary[id][1].to_i - summary[id][0].to_i)
+            data[m].push(summary[id][1].to_i - summary[id][0].to_i)
           else
-            @data[m - 1].push(summary[id][1].to_i)
+            data[m].push(summary[id][1].to_i)
           end
         end
       end
     }
+    data
+  end
+
+  def get_year_data(year, start, item, id, include_income, include_expense)
+    data = []
+    YEAR_NUM.times {|y|
+      ydata = []
+      year + y
+      mdata = get_month_data(year + y, start, item, id, include_income, include_expense, y.to_f / YEAR_NUM, YEAR_NUM)
+      mdata.each {|d|
+        d.each_with_index {|s, i|
+          if (ydata[i])
+            ydata[i] += s
+          else
+            ydata[i] = s
+          end
+        }
+      }
+      data.push(ydata)
+    }
+    data
+  end
+
+  def get_data(y = @year, start = 0)
+    include_income = (@parent.get_gconf_bool('/general/graph_include_income'))
+    include_expense = (@parent.get_gconf_bool('/general/graph_include_expense'))
+
+    item = @category.active_item
+    id = item.to_i
+
+    @data = if (@mode == YEAR_MODE)
+              get_year_data(y - YEAR_NUM + 1, start, item, id, include_income, include_expense)
+            else
+              get_month_data(y, start, item, id, include_income, include_expense)
+            end
     @progress.end_progress
   end
 
@@ -192,6 +244,13 @@ class GraphWindow < SummaryWindow
       draw(@year, true)
     }
     @button_box.pack_start(@exceptional, :expand => false, :fill => false, :padding => 0)
+
+    @x_mode = Gtk::CheckButton.new("年グラフ")
+    @x_mode.signal_connect("toggled"){|w|
+      @mode = (w.active?) ? YEAR_MODE : MONTH_MODE
+      draw(@year, true)
+    }
+    @button_box.pack_start(@x_mode, :expand => false, :fill => false, :padding => 40)
   end
 
   def hide
@@ -231,7 +290,7 @@ class Graph < Gtk::DrawingArea
   LINE_ON_OFF_DASH = [4, 4]
   LINE_SOLID = []
 
-  attr_accessor :min_x, :data, :title, :legend
+  attr_accessor :data, :title, :legend
 
   def initialize
     @gc = nil
@@ -270,21 +329,25 @@ class Graph < Gtk::DrawingArea
 
     signal_connect("draw") {|w, cr|
       @gc = cr
-      draw(@data) if (@data && @data.size > 0)
+      draw if (@data && @data.size > 0)
     }
+  end
+
+  def min_x=(min)
+    @min_x = min
+    if (min > 1000)
+      @max_x = @min_x + GraphWindow::YEAR_NUM - 1
+    else
+      @max_x = @min_x + 11
+    end
   end
 
   private
 
-  def draw(data, start = nil)
+  def draw
     return if (@gc.nil?)
-    if (start)
-      @min_x = start
-      @max_x = @min_x + 11
-    end
 
-    @data = data
-    auto_scale(data)
+    auto_scale(@data)
     redraw
   end
 
@@ -396,10 +459,10 @@ class Graph < Gtk::DrawingArea
 
   def draw_gauge_x(v)
     x = get_x(v)
-    v -= 12 if (v > 12)
+    v -= 12 if (v > 12 && v < 1000)
     draw_line(x, @top_margin, x, @top_margin + @gauge_len)
     draw_line(x, @top_margin + @height, x, @top_margin + @height - @gauge_len)
-    num = create_pango_layout(Commalize(v))
+    num = create_pango_layout(v.to_s)
     w, h =  num.pixel_size
     draw_text(x - w / 2, @top_margin + @height + @num_margin, num)
     caption = create_pango_layout(@caption_x)
@@ -435,7 +498,7 @@ class Graph < Gtk::DrawingArea
     @gc.line_cap = Cairo::LineCap::BUTT
     @gc.line_join = Cairo::LineJoin::MITER
   end
- 
+
   def set_color(c)
     @gc.set_source_rgb(c[0] / 255.0, c[1] / 255.0, c[2] / 255.0)
   end
@@ -478,7 +541,7 @@ class Graph < Gtk::DrawingArea
     @left_margin =
       [maxs, mins].max + create_pango_layout(@caption_y).pixel_size[0] +
       @num_margin * 2 + @legend_margin
-    @right_margin = 
+    @right_margin =
       @legend.collect{|l| create_pango_layout(l).pixel_size[0]}.max.to_i +
       @legend_margin * 2 + @num_margin + @legend_size if (@legend)
     @width = [allocation.width - @left_margin - @right_margin, 100].max
