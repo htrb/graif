@@ -115,7 +115,7 @@ class GraphWindow < SummaryWindow
       @graph.min_x = @parent.start_of_year
     end
     @graph.data = @data
-    @graph.window.invalidate_rect(nil)
+    @graph.window.invalidate_rect(nil) if (@graph.window)
     @drawing = false
   end
 

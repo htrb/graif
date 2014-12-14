@@ -1,3 +1,8 @@
+2014-12-14  Hiroyuki Ito  <ZXB01226 at nifty.com>
+
+	* src/graph.rb (GraphWindow#draw): check "@graph.window" before
+	call "invalidate_rect".
+
 2014-12-10  Hiroyuki Ito  <ZXB01226 at nifty.com>
 
 	* src/graph.rb (GraphWindow): add year mode.
