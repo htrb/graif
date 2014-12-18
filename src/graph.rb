@@ -204,6 +204,7 @@ class GraphWindow < SummaryWindow
   end
 
   def get_data(y = @year, start = 0)
+    updating
     include_income = (@parent.get_gconf_bool('/general/graph_include_income'))
     include_expense = (@parent.get_gconf_bool('/general/graph_include_expense'))
 
@@ -216,6 +217,7 @@ class GraphWindow < SummaryWindow
               get_month_data(y, start, item, id, include_income, include_expense)
             end
     @progress.end_progress
+    updating_done
   end
 
   def create_additional_btns
