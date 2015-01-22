@@ -25,7 +25,6 @@ class GraphWindow < SummaryWindow
     super(parent, win, data, false, true)
     @graph = Graph.new
     set_size_request(600, 400)
-    @year = Date.today.year
     @data = []
 
     @cb_year = DummyCombo.new
@@ -33,12 +32,12 @@ class GraphWindow < SummaryWindow
 
     @category_expense = CategoryComboBox.new(Zaif_category::EXPENSE, true)
     @category_expense.signal_connect("changed"){|w|
-      draw(@year, true)
+      draw(@@year, true)
     }
 
     @category_income = CategoryComboBox.new(Zaif_category::INCOME, true)
     @category_income.signal_connect("changed"){|w|
-      draw(@year, true)
+      draw(@@year, true)
     }
 
     pack_start(@category_expense, :expand => false, :fill => false, :padding => 0)
@@ -47,7 +46,7 @@ class GraphWindow < SummaryWindow
     create_additional_btns
 
     signal_connect('map') {|w|
-      y = (@mode == YEAR_MODE) ? @year : @@year
+      y = @@year
       show_data(y, @@month)
     }
 
@@ -63,7 +62,7 @@ class GraphWindow < SummaryWindow
     else
       @category_expense.visible = false
     end
-    draw(y)
+    draw(y, true)
     updating_done
   end
 
@@ -79,7 +78,7 @@ class GraphWindow < SummaryWindow
                               y, start + 1,
                               (start == 0)? y: y + 1, (start == 0)? 12: start)
     end
-    if ((redraw || @data.size < 1 || y != @year) && @category.active_item)
+    if ((redraw || @data.size < 1 || y != @@year) && @category.active_item)
       category = []
       @category.active_item.each_child {|c|
         if (@graph_type.active == 0)
@@ -92,12 +91,11 @@ class GraphWindow < SummaryWindow
       if (@category.active_item.to_i != 0)
         category.push(@category.active_item.to_s)
       end
-      @year = y
       if (@mode == YEAR_MODE)
         if (@graph_type.active == 0)
-          @graph.title = "年度支出"
+          @graph.title = "#{@window.title} 年度支出"
         else
-          @graph.title = "年度収入"
+          @graph.title = "#{@window.title} 年度収入"
         end
       else
         if (@graph_type.active == 0)
@@ -110,12 +108,11 @@ class GraphWindow < SummaryWindow
       get_data(y, start)
     end
     if (@mode == YEAR_MODE)
-      @graph.min_x = @year - YEAR_NUM + 1
+      @graph.min_x = y - YEAR_NUM + 1
     else
       @graph.min_x = @parent.start_of_year
     end
     @graph.data = @data
-    @graph.window.invalidate_rect(nil) if (@graph.window)
     @drawing = false
   end
 
@@ -203,7 +200,7 @@ class GraphWindow < SummaryWindow
     data
   end
 
-  def get_data(y = @year, start = 0)
+  def get_data(y = @@year, start = 0)
     updating
     include_income = (@parent.get_gconf_bool('/general/graph_include_income'))
     include_expense = (@parent.get_gconf_bool('/general/graph_include_expense'))
@@ -237,20 +234,20 @@ class GraphWindow < SummaryWindow
         @category_expense.visible = false
         @category = @category_income
       end
-      draw(@year, true)
+      draw(@@year, true)
     }
     @button_box.pack_start(@graph_type, :expand => false, :fill => false, :padding => 10)
 
     @exceptional = Gtk::CheckButton.new("含特別")
     @exceptional.signal_connect("clicked"){|w|
-      draw(@year, true)
+      draw(@@year, true)
     }
     @button_box.pack_start(@exceptional, :expand => false, :fill => false, :padding => 0)
 
     @x_mode = Gtk::CheckButton.new("年グラフ")
     @x_mode.signal_connect("toggled"){|w|
       @mode = (w.active?) ? YEAR_MODE : MONTH_MODE
-      draw(@year, true)
+      draw(@@year, true)
     }
     @button_box.pack_start(@x_mode, :expand => false, :fill => false, :padding => 40)
   end
