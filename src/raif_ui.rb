@@ -1045,7 +1045,7 @@ class Raif_ui < Gtk::Window
                           :comments => "#{APP_NAME} は zaif とデータ互換の家計簿ソフトです",
                           :authors => APP_AUTHORS,
                           :website => WEBSITE,
-#                          :license_type => :gpl_3_0,
+                          :license_type => :gpl_3_0,
                           :logo => Icon,
                           )
   end
