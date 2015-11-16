@@ -38,7 +38,7 @@ end
 
 class MyLabel < Gtk::Label
   def initialize(s, f = false)
-    super(s, f)
+    super(s, {:use_underline => f})
     self.xpad = 10
     self.xalign = 0
   end
@@ -618,7 +618,7 @@ class TimeInput < Gtk::Grid
     label = MyLabel.new(_("時刻"))
     attach(label, 0, 0, 1, 1)
     attach(@hour, 1, 0, 1, 1)
-    label = Gtk::Label.new(":")
+    label = Gtk::Label.new(":", {:use_underline => false})
     label.set_margin_start(PAD / 2)
     label.set_margin_end(PAD / 2)
     attach(label, 2, 0, 1, 1)
@@ -664,7 +664,7 @@ class SubtotalPanel < Gtk::Frame
       [:@expense, _("支出:")],
       [:@subtotal, _("小計:")]
     ].each {|val, title|
-      label = instance_variable_set(val, Gtk::Label.new(""))
+      label = instance_variable_set(val, Gtk::Label.new("", {:use_underline => false}))
       hb = Gtk::Box.new(:horizontal, 0)
       hb.pack_start(MyLabel.new(title), :expand => false, :fill => false, :padding => 0)
       hb.pack_start(label, :expand => false, :fill => false, :padding => 0)
@@ -812,6 +812,7 @@ class Memo_entry < Gtk::Entry
 
     comp = Gtk::EntryCompletion.new 
     comp.set_model(@@completion_model)
+=begin
     comp.set_match_func{|completion, key, iter|
       if (@key != self.text)
         @key = self.text.dup
@@ -829,6 +830,7 @@ class Memo_entry < Gtk::Entry
       end
       iter && iter[0] && iter[0].downcase =~ @key_regexp
     }
+=end
     comp.popup_completion = true
     comp.popup_set_width = true
     comp.inline_completion = false

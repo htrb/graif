@@ -141,7 +141,7 @@ class SettingPanel < Gtk::Notebook
     hbox.pack_start(cmb, :expand => false, :fill => false, :padding => PAD) if (account)
     hbox.pack_start(entry, :expand => false, :fill => false, :padding => PAD)
     if (account)
-      hbox.pack_start(Gtk::Label.new(_(" 残高:")), :expand => false, :fill => false, :padding => PAD)
+      hbox.pack_start(Gtk::Label.new(_(" 残高:"), {:use_underline => false}), :expand => false, :fill => false, :padding => PAD)
       hbox.pack_start(subtotal, :expand => false, :fill => false, :padding => PAD)
     end
     if (widget)

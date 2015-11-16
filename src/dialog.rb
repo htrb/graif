@@ -5,7 +5,7 @@ class DialogWindow < Gtk::Window
   attr_reader :geometry
 
   def initialize(parent)
-    super(Gtk::Window::Type::TOPLEVEL)
+    super(Gtk::WindowType::TOPLEVEL)
     @parent = parent
     @show_all = true
     set_icon(Icon)
@@ -364,7 +364,7 @@ class AccountSummaryWindow < SummaryWindow
 
     tree_view.set_size_request(480, 200)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
@@ -477,7 +477,7 @@ class CategorySummaryWindow < SummaryWindow
 
     tree_view.set_size_request(320, 200)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
@@ -695,7 +695,7 @@ class BudgetWindow < SummaryWindow
 
     tree_view.set_size_request(420, 300)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
@@ -893,6 +893,7 @@ class MonthSummaryWindow < SummaryWindow
       column.sort_order = Gtk::SortType::DESCENDING
       column.sort_column_id = id
       tree_view.append_column(column)
+=begin
       tree_view.model.set_sort_func(id){|itr1, itr2|
         a = itr1[id]
         b = itr2[id]
@@ -909,6 +910,7 @@ class MonthSummaryWindow < SummaryWindow
           end
         end
       }
+=end
     }
 
     [COLUMN_INDEX, COLUMN_ITEM].each {|i|
@@ -919,7 +921,7 @@ class MonthSummaryWindow < SummaryWindow
 
     tree_view.set_size_request(600, 400)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
@@ -1091,7 +1093,7 @@ class AccountInOutWindow < SummaryWindow
 
     tree_view.set_size_request(600, 400)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
@@ -1329,7 +1331,7 @@ class ItemSummaryWindow < SummaryWindow
 
     tree_view.set_size_request(600, 400)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     scrolled_window = Gtk::ScrolledWindow.new
     scrolled_window.set_size_request(600, 400)

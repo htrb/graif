@@ -86,7 +86,7 @@ class SearchDialog < Gtk::Dialog
   def initialize(parent)
     super(:title => "検索",
           :parent => parent,
-          :flags => Gtk::Dialog::Flags::MODAL,
+          :flags => Gtk::DialogFlags::MODAL,
           :buttons => [
             [Gtk::Stock::CANCEL, Gtk::ResponseType::CANCEL],
             [Gtk::Stock::OK, Gtk::ResponseType::OK]

@@ -22,7 +22,7 @@ end
 Gtk.init
 
 # Create the main window:
-@window = Gtk::Window.new(Gtk::Window::Type::TOPLEVEL)
+@window = Gtk::Window.new(Gtk::WindowType::TOPLEVEL)
 @window.set_size_request(400, 400)
 @window.signal_connect("delete_event") { Gtk.main_quit }
 @window.set_border_width(5)

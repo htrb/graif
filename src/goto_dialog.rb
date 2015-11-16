@@ -5,7 +5,7 @@ class GotoDialog < Gtk::Dialog
   def initialize(parent)
     super(:title => "移動",
           :parent => parent,
-          :flags => Gtk::Dialog::Flags::MODAL,
+          :flags => Gtk::DialogFlags::MODAL,
           :buttons => [
             [Gtk::Stock::CANCEL, Gtk::ResponseType::CANCEL],
             [Gtk::Stock::OK, Gtk::ResponseType::OK]
@@ -47,7 +47,7 @@ class GotoDialog < Gtk::Dialog
       [@month, '月'],
     ].each {|(widget, title)|
       hbox.pack_start(widget, :expand => false, :fill => false, :padding => 10)
-      hbox.pack_start(Gtk::Label.new(title), :expand => false, :fill => false, :padding => 0)
+      hbox.pack_start(Gtk::Label.new(title, {:use_underline => false}), :expand => false, :fill => false, :padding => 0)
       widget.signal_connect("key-press-event", &return_key_pressed)
     }
     self.child.pack_start(hbox, :expand => false, :fill => false, :padding => 10)

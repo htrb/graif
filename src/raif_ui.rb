@@ -45,7 +45,7 @@ class Raif_ui < Gtk::Window
   MyIcons.add_default
 
   def initialize(path)
-    super(Gtk::Window::Type::TOPLEVEL)
+    super(Gtk::WindowType::TOPLEVEL)
 
     @app_conf = GraifConfig.new(CONFIG_FILE)
     @setup_win = nil
@@ -57,8 +57,7 @@ class Raif_ui < Gtk::Window
 
     @clipboard = Gtk::Clipboard.get('PRIMARY')
 
-    @window_group = Gtk::WindowGroup.new
-    @window_group.add(self)
+    @window_group = Gtk::WindowGroup#    @window_group.add(self)
 
     self.path = path
     set_icon(Icon)
@@ -745,9 +744,9 @@ class Raif_ui < Gtk::Window
 
   def err_message(str, parent = self, type = Gtk::MessageType::ERROR, titie = "Error")
     mes = Gtk::MessageDialog.new(:parent => parent,
-                                 :flags => Gtk::Dialog::Flags::MODAL,
+                                 :flags => Gtk::DialogFlags::MODAL,
                                  :type => type,
-                                 :buttons_type => Gtk::MessageDialog::ButtonsType::OK,
+                                 :buttons_type => Gtk::ButtonsType::OK,
                                  :message => str)
     mes.title = title
     mes.run
@@ -756,9 +755,9 @@ class Raif_ui < Gtk::Window
 
   def conf_message(str, parent = self, default = true, type = Gtk::MessageType::QUESTION)
     mes = Gtk::MessageDialog.new(:parent => parent,
-                                 :flags => Gtk::Dialog::Flags::MODAL,
+                                 :flags => Gtk::DialogFlags::MODAL,
                                  :type => type,
-                                 :buttons_type => Gtk::MessageDialog::ButtonsType::YES_NO,
+                                 :buttons_type => Gtk::ButtonsType::YES_NO,
                                  :message => str)
     if (default)
       mes.set_default_response(Gtk::ResponseType::YES)
@@ -1013,7 +1012,7 @@ class Raif_ui < Gtk::Window
 
     tree_view.set_size_request(600, 200)
     tree_view.selection.mode = Gtk::SelectionMode::SINGLE
-    tree_view.enable_grid_lines = Gtk::TreeView::GridLines::VERTICAL
+    tree_view.enable_grid_lines = Gtk::TreeViewGridLines::VERTICAL
 
     tree_view
   end

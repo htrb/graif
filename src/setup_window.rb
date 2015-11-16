@@ -570,11 +570,11 @@ class SetupWindow < DialogWindow
     @row = 0
     @start_of_year = Gtk::SpinButton.new(1, 12, 1)
     @start_of_year.xalign = 1
-    add_option(vbox, _("年度の始まり:"), @start_of_year, Gtk::Label.new(_('月')))
+    add_option(vbox, _("年度の始まり:"), @start_of_year, Gtk::Label.new(_('月'), {:use_underline => false}))
 
     @consumption_tax = Gtk::SpinButton.new(0, 100, 1)
     @consumption_tax.xalign = 1
-    add_option(vbox, _("消費税:"), @consumption_tax, Gtk::Label.new('%'))
+    add_option(vbox, _("消費税:"), @consumption_tax, Gtk::Label.new('%', {:use_underline => false}))
 
     @rb_commalize_n = Gtk::RadioButton.new(_("3"))
     add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(@rb_commalize_n, _("4")))
