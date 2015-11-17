@@ -252,8 +252,8 @@ class ReceiptDialog < DialogWindow
     box.attach(@time, 0, 0, 1, 3)
 
     label = MyLabel.new(_("消費税"))
-    @tax_inside = Gtk::RadioButton.new(_("内税"))
-    @tax_outside = Gtk::RadioButton.new(@tax_inside, _("外税"))
+    @tax_inside = Gtk::RadioButton.new(:label => _("内税"))
+    @tax_outside = Gtk::RadioButton.new(:member => @tax_inside, :label => _("外税"))
     @tax_inside.active = true
     @tax_inside.signal_connect('toggled') {|w|
       update_table

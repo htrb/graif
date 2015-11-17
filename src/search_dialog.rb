@@ -9,13 +9,13 @@ class SearchWidget
 
     @memo = Memo_entry.new
     @memo.activates_default = true
-    @rb_memo = Gtk::RadioButton.new(_("メモ: "))
+    @rb_memo = Gtk::RadioButton.new(:label => _("メモ: "))
 
     @account = AccountComboBox.new
-    @rb_account = Gtk::RadioButton.new(@rb_memo, _("口座: "))
+    @rb_account = Gtk::RadioButton.new(:member => @rb_memo, :label => _("口座: "))
 
     @category = CategoryComboBox.new(Zaif_category::ALL)
-    @rb_category = Gtk::RadioButton.new(@rb_memo, _("分類: "))
+    @rb_category = Gtk::RadioButton.new(:member => @rb_memo, :label => _("分類: "))
 
     @search_type = @rb_memo.group.size - 1
 

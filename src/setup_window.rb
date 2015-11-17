@@ -576,11 +576,11 @@ class SetupWindow < DialogWindow
     @consumption_tax.xalign = 1
     add_option(vbox, _("消費税:"), @consumption_tax, Gtk::Label.new('%', {:use_underline => false}))
 
-    @rb_commalize_n = Gtk::RadioButton.new(_("3"))
-    add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(@rb_commalize_n, _("4")))
+    @rb_commalize_n = Gtk::RadioButton.new(:label => _("3"))
+    add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(:member => @rb_commalize_n, :label => _("4")))
 
     @rb_commalize_sep = Gtk::RadioButton.new(_(","))
-    add_option(vbox, _("数値区切文字:"), @rb_commalize_sep, Gtk::RadioButton.new(@rb_commalize_sep, _(".")))
+    add_option(vbox, _("数値区切文字:"), @rb_commalize_sep, Gtk::RadioButton.new(:member => @rb_commalize_sep, :label => _(".")))
 
     @graph_include_income = Gtk::CheckButton.new(_("支出グラフの計算に収入を含める"))
     add_option(vbox, nil, @graph_include_income)
