@@ -223,11 +223,11 @@ class Raif_ui < Gtk::Window
     vbox.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
     vbox.pack_start(@subtotal_panel, :expand => false, :fill => false, :padding => 0)
 
-    vbox_tab.pack_start(@tab)
+    vbox_tab.pack_start(@tab, :expand => true, :fill => true, :padding => 0)
     vbox_tab.pack_start(hbox_btn, :expand => false, :fill => false, :padding => 0)
 
     hbox.pack_start(@calendar, :expand => false, :fill => false, :padding => 0)
-    hbox.pack_start(vbox_tab)
+    hbox.pack_start(vbox_tab, :expand => true, :fill => true, :padding => 0)
     vbox.pack_start(hbox, :expand => false, :fill => false, :padding => 0)
 
     add(vbox)
@@ -747,8 +747,8 @@ class Raif_ui < Gtk::Window
                                  :flags => Gtk::DialogFlags::MODAL,
                                  :type => type,
                                  :buttons_type => Gtk::ButtonsType::OK,
-                                 :message => str)
-    mes.title = title
+                                 :message => str.to_s)
+    mes.title = title.to_s
     mes.run
     mes.destroy
   end

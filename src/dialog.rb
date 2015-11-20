@@ -72,7 +72,7 @@ class SummaryDialog < DialogWindow
 
     vbox = Gtk::Box.new(:vertical, 0)
     vbox.pack_start(switcher, :expand => false, :fill => false, :padding => 0)
-    vbox.pack_start(@stack)
+    vbox.pack_start(@stack, :expand => true, :fill => true, :padding => 0)
     add(vbox)
 
     signal_connect('key-press-event') {|w, e|
@@ -638,7 +638,7 @@ class BudgetWindow < SummaryWindow
     return unless (itr)
     begin
       month.set_budget(itr[COLUMN_ID].to_i, itr[COLUMN_BUDGET], itr[COLUMN_SUM])
-      set_budget(itr.nth_child(0), month) if (itr.has_child?)
+      set_budget(itr.model.iter_nth_child(itr, 0), month) if (itr.has_child?)
     end while (itr.next!)
   end
 
@@ -1099,7 +1099,7 @@ class AccountInOutWindow < SummaryWindow
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view
   end

@@ -116,7 +116,7 @@ class ReceiptDialog < DialogWindow
     scrolled_window.hscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.vscrollbar_policy = Gtk::PolicyType::AUTOMATIC
     scrolled_window.add(tree_view)
-    box.pack_start(scrolled_window)
+    box.pack_start(scrolled_window, :expand => true, :fill => true, :padding => 0)
 
     tree_view.selection.signal_connect('changed') {|w|
       itr = w.selected

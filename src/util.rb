@@ -372,7 +372,7 @@ class CategoryComboBox < Gtk::ComboBox
     return unless (iter)
     begin
       yield(iter)
-      each(iter.nth_child(0)) {|i|
+      each(iter.model.iter_nth_child(iter, 0)) {|i|
         yield(i)
       } if (iter.has_child?)
     end while (iter.next!)

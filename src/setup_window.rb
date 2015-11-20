@@ -68,7 +68,7 @@ class SetupWindow < DialogWindow
                             itr[COLUMN_EXPENSE],
                             itr[COLUMN_INCOME])
       parent.add_child(c)
-      category_set_item(itr.nth_child(0), c) if (itr.has_child?)
+      category_set_item(itr.model.nth_child(itr, 0), c) if (itr.has_child?)
     end while (itr.next!)
   end
 
