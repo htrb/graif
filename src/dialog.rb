@@ -26,7 +26,7 @@ class DialogWindow < Gtk::Window
     if (self.visible?)
       self.present
       return
-    end 
+    end
     self.parse_geometry(@geometry) if (@geometry)
     if (@show_all)
       show_all
@@ -398,7 +398,7 @@ class AccountSummaryWindow < SummaryWindow
 
       if (progress < 1)
         @progress.show_progress(progress) if (@parent.progress_bar?)
-        next 
+        next
       end
 
       row = model.append(root)
@@ -519,7 +519,7 @@ class CategorySummaryWindow < SummaryWindow
       row[COLUMN_TOTAL_BALANCE] = 0.0
     end
 
-    row[COLUMN_TOTAL_BALANCE] = 
+    row[COLUMN_TOTAL_BALANCE] =
       if (category.expense || category.income)
         isum - esum
       else
@@ -638,7 +638,7 @@ class BudgetWindow < SummaryWindow
     return unless (itr)
     begin
       month.set_budget(itr[COLUMN_ID].to_i, itr[COLUMN_BUDGET], itr[COLUMN_SUM])
-      set_budget(itr.model.iter_nth_child(itr, 0), month) if (itr.has_child?)
+      set_budget(itr.nth_child(0), month) if (itr.has_child?)
     end while (itr.next!)
   end
 
@@ -709,7 +709,7 @@ class BudgetWindow < SummaryWindow
   def save
     return unless (@modified)
     month = @zaif_data.get_month_data(@@year, @@month)
-    set_budget(@tree_view.model.iter_first.first_child, month)
+    set_budget(@tree_view.model.iter_first.children, month)
     @modified = false
   end
 
@@ -819,11 +819,11 @@ class MonthSummaryWindow < SummaryWindow
                  ['*',            :COLUMN_TYPE,     String],
                  [_('日'),        :COLUMN_DAY,      Numeric],
                  [_('時刻'),      :COLUMN_TIME,     String],
-                 
+
                  [_('分類'),      :COLUMN_CATEGORY, String],
                  [_('収入'),      :COLUMN_INCOME,   Numeric],
                  [_('支出'),      :COLUMN_EXPENSE,  Numeric],
-                 
+
                  [_('移動/調整'), :COLUMN_MOVE,     Numeric],
                  [_('口座'),      :COLUMN_ACCOUNT,  String],
                  [_('メモ'),      :COLUMN_MEMO,     String],
@@ -1142,7 +1142,7 @@ class AccountInOutWindow < SummaryWindow
       month.each_with_index {|data, index|
         if (index % 10 == 0 && @parent.progress_bar?)
           progress = if (n > 1) then (j + 1) / 12.0 else index / size end #/
-          @progress.show_progress(progress) 
+          @progress.show_progress(progress)
         end
 
         d, i = data

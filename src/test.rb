@@ -71,7 +71,7 @@ tree.expand_all
 
 e = Gtk::Entry.new
 
-h = Gtk::EntryCompletion.new 
+h = Gtk::EntryCompletion.new
 m = Gtk::ListStore.new(String)
 h.set_model(m)
 

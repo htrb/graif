@@ -11,7 +11,7 @@ class GotoDialog < Gtk::Dialog
             [Gtk::Stock::OK, Gtk::ResponseType::OK]
           ]
           )
-    
+
     signal_connect("delete-event") {|w, e|
       w.hide
       w.signal_emit_stop("delete-event")
@@ -26,10 +26,10 @@ class GotoDialog < Gtk::Dialog
 
     @month.signal_connect("value-changed") {|w|
       if (w.value > 12)
-        @year.spin(Gtk::SpinButton::Type::STEP_FORWARD, 1)
+        @year.spin(Gtk::SpinType::STEP_FORWARD, 1)
         w.value = 1
       elsif(w.value < 1)
-        @year.spin(Gtk::SpinButton::Type::STEP_BACKWARD, 1)
+        @year.spin(Gtk::SpinType::STEP_BACKWARD, 1)
         w.value = 12
       end
     }
@@ -58,9 +58,8 @@ class GotoDialog < Gtk::Dialog
     @month.value = m
     @month.grab_focus
     show_all
-    super() {|r|
-      yield(r == Gtk::ResponseType::OK, @year.value.to_i, @month.value.to_i)
-    }
+    r = super()
+    yield(r == Gtk::ResponseType::OK, @year.value.to_i, @month.value.to_i)
     hide
   end
 end

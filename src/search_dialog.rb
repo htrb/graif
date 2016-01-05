@@ -106,9 +106,8 @@ class SearchDialog < Gtk::Dialog
 
   def run(&block)
     show_all
-    super {|r|
-      yield(r == Gtk::ResponseType::OK, @search_item.type, @search_item.word)
-    }
+    r = super()
+    yield(r == Gtk::ResponseType::OK, @search_item.type, @search_item.word)
     hide
   end
 

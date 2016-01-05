@@ -8,7 +8,7 @@ class ReceiptDialog < DialogWindow
                    [_('割引'), :COLUMN_ADJUST,   Integer, true],
                    [_('税'),   :COLUMN_TAX,      Integer, false],
                    [_('小計'), :COLUMN_SUBTOTAL, Integer, false],
-                   [_('メモ'), :COLUMN_MEMO,     String,  true], 
+                   [_('メモ'), :COLUMN_MEMO,     String,  true],
                   ].each_with_index {|data, i|
     const_set(data[COLUMN_DATA_ID], i)
     data[COLUMN_DATA_ID] = i
@@ -32,7 +32,7 @@ class ReceiptDialog < DialogWindow
 
     @calendar = calendar
     @zaif_data = data
-    @exceptional = 
+    @exceptional =
     @vbox =Gtk::Box.new(:vertical, 0)
     create_input_panel(@vbox)
     @tree_view = create_table(@vbox)

@@ -244,9 +244,9 @@ class CategoryTreeModel < Gtk::TreeStore
     @@category = category
   end
 
-  def CategoryTreeModel::update(add_root = false)
+  def CategoryTreeModel::update
     Instances.each {|c|
-      c.update(add_root)
+      c.update
     }
   end
 
@@ -255,15 +255,16 @@ class CategoryTreeModel < Gtk::TreeStore
     @@category = category if (category)
     @category_name = {}
     @type = type
+    @add_root = add_root
 
     Instances.push(self)
 
-    update(add_root) if (@@category)
+    update if (@@category)
   end
 
-  def update(add_root = false)
+  def update
     self.clear
-    if (add_root && @@category.children.size != 0)
+    if (@add_root && @@category.children.size != 0)
       row = self.append(nil)
       row[COLUMN_NAME] = "Root"
       row[COLUMN_ITEM] = @@category
@@ -279,7 +280,7 @@ class CategoryTreeModel < Gtk::TreeStore
     }
   end
 
-  def add_category(row, category)
+  def add_item(row, category)
     if ((@type == Zaif_category::EXPENSE && category.expense) ||
         (@type == Zaif_category::INCOME && category.income) ||
         (@type == Zaif_category::EXPENSE_HAVE_CHILDREN &&
@@ -303,8 +304,24 @@ class CategoryTreeModel < Gtk::TreeStore
         row[COLUMN_UNIFIED_NAME] = "#{category.to_s}\t#{@category_name[name]}"
       end
     end
+    row
+  end
+
+  def add_category(row, category)
+    row1 = add_item(row, category)
+    return if (row1 == row)
+
+    if (@add_root && category.children.size != 0)
+      row2 = add_item(row1, category)
+      if (row2 != row1)
+        separator = self.append(row1)
+        separator[COLUMN_ITEM] = -1
+        separator[COLUMN_NAME] = ""
+      end
+    end
+
     category.each_child {|c|
-      add_category(row, c)
+      add_category(row1, c)
     }
   end
 
@@ -330,17 +347,20 @@ class CategoryComboBox < Gtk::ComboBox
   def initialize(type, add_root = false)
     super(:entry => false, :model => CategoryTreeModel.new(type, add_root), :area => nil)
 
+    self.set_row_separator_func { |model, iter|
+      (iter[CategoryTreeModel::COLUMN_ITEM] && iter[CategoryTreeModel::COLUMN_ITEM].to_i < 0)
+    }
     renderer_s = Gtk::CellRendererText.new
     pack_start(renderer_s, :expand => true, :fill => true, :padding => 0)
     set_attributes(renderer_s, :text => CategoryTreeModel::COLUMN_NAME)
     Instances.push(self)
-    update(0, add_root)
+    update(0)
   end
 
-  def update(active = 0, add_root = false)
+  def update(active = 0)
     row = nil
     begin
-      self.model.update(add_root)
+      self.model.update
       self.active = active
     rescue NoMethodError
     end
@@ -370,9 +390,14 @@ class CategoryComboBox < Gtk::ComboBox
 
   def each(iter = self.model.iter_first, &block)
     return unless (iter)
+=begin
+    iter.model.each {|model, path, iter|
+      yield(iter)
+    }
+=end
     begin
       yield(iter)
-      each(iter.model.iter_nth_child(iter, 0)) {|i|
+      each(iter.nth_child(0)) {|i|
         yield(i)
       } if (iter.has_child?)
     end while (iter.next!)
@@ -596,7 +621,7 @@ class TimeInput < Gtk::Grid
     @min.signal_connect("value-changed") {|w|
       if (w.value > 59)
         if (@hour.value < 23)
-          @hour.spin(Gtk::SpinButton::Type::STEP_FORWARD, 1)
+          @hour.spin(Gtk::SpinType::STEP_FORWARD, 1)
           w.value = 0
           w.set_range(-1, 60)
         else
@@ -605,7 +630,7 @@ class TimeInput < Gtk::Grid
         end
       elsif(w.value < 0)
         if (@hour.value > 0)
-          @hour.spin(Gtk::SpinButton::Type::STEP_BACKWARD, 1)
+          @hour.spin(Gtk::SpinType::STEP_BACKWARD, 1)
           w.value = 59
           w.set_range(-1, 60)
         else
@@ -810,14 +835,11 @@ class Memo_entry < Gtk::Entry
 
     width_chars = 30
 
-    comp = Gtk::EntryCompletion.new 
+    comp = Gtk::EntryCompletion.new
     comp.set_model(@@completion_model)
-=begin
     comp.set_match_func{|completion, key, iter|
-      if (@key != self.text)
-        @key = self.text.dup
-#        puts key.kconv(MIGEMO_KCODE, Kconv::UTF8)
-#        puts self.text.kconv(MIGEMO_KCODE, Kconv::UTF8)
+      if (@key != key)
+        @key = key.dup
         begin
           if (@@use_migemo)
             @key_regexp = /\A(?:#{migemo_get_regexp(@key)})/i
@@ -830,7 +852,7 @@ class Memo_entry < Gtk::Entry
       end
       iter && iter[0] && iter[0].downcase =~ @key_regexp
     }
-=end
+
     comp.popup_completion = true
     comp.popup_set_width = true
     comp.inline_completion = false

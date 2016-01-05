@@ -504,7 +504,7 @@ class Raif_ui < Gtk::Window
     parent.submenu = menu
     Plugin.instances.collect {|i|
       begin
-        item = Gtk::MenuItem.new(i.title);
+        item = Gtk::MenuItem.new(:label => i.title, :use_underline => true)
         item.signal_connect("activate") {
           i.call(@calendar.date)
         }
@@ -518,7 +518,7 @@ class Raif_ui < Gtk::Window
   def add_group(win)
     @window_group.add(win)
   end
-  
+
   def delete_btn_state(state)
     @delete_btn.visible = (state == true)
   end

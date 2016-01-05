@@ -68,7 +68,7 @@ class SetupWindow < DialogWindow
                             itr[COLUMN_EXPENSE],
                             itr[COLUMN_INCOME])
       parent.add_child(c)
-      category_set_item(itr.model.nth_child(itr, 0), c) if (itr.has_child?)
+      category_set_item(itr.nth_child(0), c) if (itr.has_child?)
     end while (itr.next!)
   end
 
@@ -383,8 +383,8 @@ class SetupWindow < DialogWindow
 
   def create_root_btns
     create_btns([
-                  [:@setup_ok_btn, Gtk::Stock::OK, :ok, :pack_end],
-                  [:@setup_cancel_btn, Gtk::Stock::CANCEL, :cancel, :pack_end]
+                  [:@setup_ok_btn, "OK", :ok, :pack_end],
+                  [:@setup_cancel_btn, "CANCEL", :cancel, :pack_end]
                 ], 10)
   end
 
@@ -563,7 +563,9 @@ class SetupWindow < DialogWindow
     @migemo_cmd = Gtk::Entry.new
     add_option(vbox, _("migemo コマンド:"), @migemo_cmd)
 
-    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => true, :fill => true, :padding => PAD)
+    frame = Gtk::Frame.new
+    frame.add(vbox)
+    hbox.pack_start(frame, :expand => true, :fill => true, :padding => PAD)
 
     vbox = Gtk::Grid.new
 
@@ -579,7 +581,7 @@ class SetupWindow < DialogWindow
     @rb_commalize_n = Gtk::RadioButton.new(:label => _("3"))
     add_option(vbox, _("数値区切桁:"), @rb_commalize_n, Gtk::RadioButton.new(:member => @rb_commalize_n, :label => _("4")))
 
-    @rb_commalize_sep = Gtk::RadioButton.new(_(","))
+    @rb_commalize_sep = Gtk::RadioButton.new(:label => _(","))
     add_option(vbox, _("数値区切文字:"), @rb_commalize_sep, Gtk::RadioButton.new(:member => @rb_commalize_sep, :label => _(".")))
 
     @graph_include_income = Gtk::CheckButton.new(_("支出グラフの計算に収入を含める"))
@@ -595,7 +597,9 @@ class SetupWindow < DialogWindow
     @history_size.xalign = 1
     add_option(vbox, _("履歴の数:"), @history_size)
 
-    hbox.pack_start(Gtk::Frame.new.add(vbox), :expand => false, :fill => false, :padding => PAD)
+    frame = Gtk::Frame.new
+    frame.add(vbox)
+    hbox.pack_start(frame, :expand => false, :fill => false, :padding => PAD)
 
     hbox
   end
