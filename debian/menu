@@ -1,8 +1,0 @@
-?package(graif): \
-  needs="X11" \
-  section="Applications/Office" \
-  command="/usr/bin/graif" \
-  icon="/usr/share/graif/pig.xpm" \
-  title="Graif" \
-  longtitle="Graif: Accounting program" \
-  description="Graif is an accounting software."

@@ -1,4 +1,6 @@
+#! /usr/bin/ruby
 # -*- coding: utf-8 -*-
+
 class RaifCSV < Plugin
   def main(d)
     dialog = Gtk::FileChooserDialog.new(:title => "Save CSV",

@@ -1,2 +1,1 @@
-EXTRA_DIST = changelog compat control copyright dirs docs menu rules	\
-	watch
+EXTRA_DIST = changelog compat control copyright dirs docs rules watch
