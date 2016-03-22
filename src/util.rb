@@ -262,13 +262,28 @@ class CategoryTreeModel < Gtk::TreeStore
     update if (@@category)
   end
 
+  def append_root(row)
+    row[COLUMN_NAME] = "Root"
+    row[COLUMN_ITEM] = @@category
+    row[COLUMN_UNIFIED_NAME] = "Root"
+  end
+
+  def add_separator(row)
+    separator = self.append(row)
+    separator[COLUMN_ITEM] = -1
+    separator[COLUMN_NAME] = ""
+  end
+
   def update
     self.clear
     if (@add_root && @@category.children.size != 0)
       row = self.append(nil)
-      row[COLUMN_NAME] = "Root"
-      row[COLUMN_ITEM] = @@category
-      row[COLUMN_UNIFIED_NAME] = "Root"
+      append_root(row)
+
+      row1 = self.append(row)
+      append_root(row1)
+
+      add_separator(row)
     end
     @category_name.clear
     @@category.each_child {|c|
@@ -314,9 +329,7 @@ class CategoryTreeModel < Gtk::TreeStore
     if (@add_root && category.children.size != 0)
       row2 = add_item(row1, category)
       if (row2 != row1)
-        separator = self.append(row1)
-        separator[COLUMN_ITEM] = -1
-        separator[COLUMN_NAME] = ""
+        add_separator(row1)
       end
     end
 
