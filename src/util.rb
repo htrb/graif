@@ -361,6 +361,7 @@ class CategoryComboBox < Gtk::ComboBox
     super(:entry => false, :model => CategoryTreeModel.new(type, add_root), :area => nil)
 
     self.set_row_separator_func { |model, iter|
+      iter.model = model unless (iter.model)
       (iter[CategoryTreeModel::COLUMN_ITEM] && iter[CategoryTreeModel::COLUMN_ITEM].to_i < 0)
     }
     renderer_s = Gtk::CellRendererText.new
