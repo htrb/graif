@@ -129,7 +129,7 @@ class GraphWindow < SummaryWindow
   end
 
   def update(y, m)
-    @category.update(false, true)
+    @category.update
     super
   end
 
