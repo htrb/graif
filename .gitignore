@@ -1,3 +1,6 @@
+debian/.debhelper
+debian/graif
+debian/graif.debhelper.log
 Makefile
 Makefile.in
 aclocal.m4
