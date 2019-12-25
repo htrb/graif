@@ -1,1 +1,2 @@
-graif_1.1.0_all.deb misc extra
+graif_1.1.0_all.deb misc optional
+graif_1.1.0_amd64.buildinfo misc optional
