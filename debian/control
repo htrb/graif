@@ -1,9 +1,9 @@
 Source: graif
 Section: misc
-Priority: extra
+Priority: optional
 Maintainer: Ito Hiroyuki <ZXB01226@nifty.com>
 Build-Depends: ruby, debhelper (>= 8.0.0), autotools-dev
-Standards-Version: 3.7.3
+Standards-Version: 4.4.1
 Homepage: https://sourceforge.net/projects/graif/
 
 Package: graif
