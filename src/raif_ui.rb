@@ -55,7 +55,7 @@ class Raif_ui < Gtk::Window
     @search_dialog = nil
     @receipt_dialog = nil
 
-    @clipboard = Gtk::Clipboard.get('PRIMARY')
+    @clipboard = Gtk::Clipboard.get(Gdk::Selection::CLIPBOARD)
 
     @window_group = Gtk::WindowGroup#    @window_group.add(self)
 
