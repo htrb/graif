@@ -79,7 +79,7 @@ end
 
 
 def CommalizeSetiing(n, s)
-  COMMALIZE[0] = n if (n.kind_of?(Fixnum))
+  COMMALIZE[0] = n if (n.kind_of?(Integer))
   COMMALIZE[1] = s if (s.kind_of?(String))
 end
 
