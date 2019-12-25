@@ -40,7 +40,7 @@ class Raif_ui < Gtk::Window
   ].each { |(icon, label)|
     const_set(icon.upcase, icon.to_sym)
     Gtk::Stock.add(icon.to_sym, label)
-    MyIcons.add(icon, Gtk::IconSet.new(Gdk::Pixbuf.new("#{PKGDATADIR}/#{icon}.xpm")))
+    MyIcons.add(icon, Gtk::IconSet.new(GdkPixbuf::Pixbuf.new(:file => "#{PKGDATADIR}/#{icon}.xpm")))
   }
   MyIcons.add_default
 
