@@ -98,7 +98,7 @@ unless (FileTest.exist?(APP_PATH))
   }
 end
 
-Icon = Gdk::Pixbuf.new("#{PKGDATADIR}/pig.xpm")
+Icon = GdkPixbuf::Pixbuf.new(:file => "#{PKGDATADIR}/pig.xpm")
 
 date = nil
 
